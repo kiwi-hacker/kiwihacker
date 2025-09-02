@@ -1,0 +1,1708 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>🌟 큐브 강화 게임 🌟</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            padding: 20px;
+            padding-bottom: 120px;
+            background: linear-gradient(to bottom right, #2c3e50, #34495e);
+            color: #ecf0f1;
+            user-select: none;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            color: #f1c40f;
+            text-shadow: 0 0 15px rgba(241, 196, 15, 0.6);
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+        }
+
+        #money, #upgradeLevel {
+            font-size: 2em;
+            margin: 8px 0;
+            font-weight: bold;
+            color: #fff;
+        }
+        #money { color: #2ecc71; }
+        #upgradeLevel { color: #3498db; }
+
+        #upgradeDisplay {
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            width: 140px;
+            height: 140px;
+            line-height: 140px;
+            border: 5px solid #fff;
+            border-radius: 25px;
+            font-size: 3.8em;
+            color: #fff;
+            cursor: pointer;
+            user-select: none;
+            font-weight: bold;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.7);
+            transition: background-color 0.3s ease-in-out, transform 0.1s ease-out, box-shadow 0.3s ease-in-out;
+            margin: 15px auto;
+            box-shadow: 0 0 20px rgba(0, 204, 255, 0.5), 0 0 40px rgba(0, 204, 255, 0.3);
+        }
+        #upgradeDisplay:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 204, 255, 0.7), 0 0 60px rgba(0, 204, 255, 0.5);
+        }
+        #upgradeDisplay:active {
+            transform: scale(0.98);
+        }
+
+        #successRate {
+            font-size: 1.4em;
+            margin-top: 10px;
+            color: #bdc3c7;
+        }
+
+        #buttonContainer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 6px;
+            margin-top: 20px;
+            margin-bottom: 30px;
+            max-width: 700px;
+        }
+
+        button {
+            padding: 10px 15px;
+            font-size: 1em;
+            cursor: pointer;
+            border-radius: 8px;
+            border: none;
+            background-color: #3498db;
+            color: #fff;
+            font-weight: bold;
+            transition: background-color 0.2s, transform 0.1s, box-shadow 0.2s;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            outline: none;
+            white-space: nowrap;
+        }
+        button:hover {
+            background-color: #2980b9;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+        }
+        button:active {
+            transform: scale(0.98);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+        button:disabled {
+            cursor: not-allowed;
+            background-color: #7f8c8d;
+            color: #bdc3c7;
+            box-shadow: none;
+            transform: none;
+        }
+
+        #earnBtn { background-color: #2ecc71; }
+        #earnBtn:hover { background-color: #27ae60; }
+        #upgradeBtn { background-color: #e67e22; }
+        #upgradeBtn:hover { background-color: #d35400; }
+        #sellBtn { background-color: #c0392b; }
+        #sellBtn:hover { background-color: #a93226; }
+        #immunityBtn { background-color: #9b59b6; }
+        #immunityBtn:hover { background-color: #8e44ad; }
+        #shopBtn { background-color: #f1c40f; color: #333; }
+        #shopBtn:hover { background-color: #f39c12; }
+        #inventoryBtn { background-color: #1abc9c; }
+        #inventoryBtn:hover { background-color: #16a085; }
+        #storeBtn, #combineBtn, #loadBtn, #settingsBtn { background-color: #34495e; border: 1px solid #7f8c8d;}
+        #storeBtn:hover, #combineBtn:hover, #loadBtn:hover, #settingsBtn:hover { background-color: #2c3e50; }
+
+        #adminToggleBtn {
+            position: fixed;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%);
+            background-color: #555;
+            color: #fff;
+            padding: 8px 12px;
+            border-top-left-radius: 8px;
+            border-bottom-left-radius: 8px;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            cursor: pointer;
+            font-size: 0.8em;
+            display: none;
+            z-index: 999;
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        #adminToggleBtn:hover {
+            background-color: #777;
+        }
+
+        #message {
+            font-size: 1.5em;
+            color: #8be0ff;
+            min-height: 30px;
+            font-weight: bold;
+            opacity: 0;
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+            text-shadow: 0 0 10px rgba(139, 224, 255, 0.4);
+            width: 95%;
+            max-width: 450px;
+            box-sizing: border-box;
+            text-align: center;
+
+            position: fixed;
+            bottom: 5%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10000;
+        }
+        #message.show {
+            opacity: 1;
+            transform: translateX(-50%);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #2c3e50;
+            border: 2px solid #3498db;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.7);
+            z-index: 1000;
+            width: 90%;
+            max-width: 500px;
+            max-height: 80vh;
+            overflow-y: auto;
+            color: #ecf0f1;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -40%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
+        }
+
+        .modal h3 {
+            margin-top: 0;
+            color: #f1c40f;
+            font-size: 1.8em;
+            margin-bottom: 18px;
+            text-shadow: 0 0 10px rgba(241, 196, 15, 0.4);
+        }
+
+        .modal div {
+            margin: 10px 0;
+            font-size: 1em;
+            line-height: 1.4;
+        }
+
+        .modal button {
+            display: block;
+            width: calc(100% - 10px);
+            margin: 12px 0 0 0;
+            background-color: #3498db;
+            padding: 10px 15px;
+            font-size: 1em;
+        }
+        .modal button:hover { background-color: #2980b9; }
+
+        .modal input[type="text"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            margin-bottom: 12px;
+            border: 1px solid #7f8c8d;
+            border-radius: 6px;
+            background-color: #3f5268;
+            color: #ecf0f1;
+            font-size: 1em;
+            box-sizing: border-box;
+        }
+        .modal input[type="text"]::placeholder {
+            color: #bdc3c7;
+        }
+
+        .selectable label {
+            display: flex;
+            align-items: center;
+            margin: 6px 0;
+            padding: 8px 12px;
+            border: 1px solid #7f8c8d;
+            border-radius: 6px;
+            cursor: pointer;
+            background-color: #34495e;
+            transition: background-color 0.2s, border-color 0.2s;
+            font-size: 0.95em;
+        }
+        .selectable label:hover {
+            background-color: #3f5268;
+            border-color: #3498db;
+        }
+        .selectable label.selected {
+            background: #3498db;
+            border: 2px solid #f1c40f;
+            font-weight: bold;
+            box-shadow: 0 0 8px rgba(241, 196, 15, 0.5);
+        }
+        .selectable input[type="radio"] {
+            margin-right: 8px;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid #ecf0f1;
+            border-radius: 50%;
+            background-color: #7f8c8d;
+            outline: none;
+            cursor: pointer;
+            transition: background-color 0.2s, border-color 0.2s;
+        }
+        .selectable input[type="radio"]:checked {
+            background-color: #f1c40f;
+            border-color: #fff;
+        }
+        .selectable input[type="radio"]:hover {
+            background-color: #bdc3c7;
+        }
+
+        #combine .modal-content-flex {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        #combine .modal-content-flex > div {
+            flex: 1;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #7f8c8d;
+            border-radius: 8px;
+            padding: 8px;
+            background-color: #34495e;
+        }
+        #combine .modal-content-flex > div strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #f1c40f;
+        }
+
+        #inventory .item-status {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+        #inventory .item-status.missing {
+            color: #e74c3c;
+        }
+        #inventory #itemHidden100 { /* Changed ID */
+            color: #9b59b6;
+            font-weight: bold;
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px dashed #7f8c8d;
+        }
+        #inventory #itemLink.item-status {
+            color: #a4c639;
+        }
+
+
+        #clearScreen {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #1a2a3a, #0a1a2a, #1a2a3a);
+            color: #fff;
+            font-size: 4em;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            z-index: 9999;
+            text-shadow: 0 0 20px #fff, 0 0 40px #f0f, 0 0 60px #0ff;
+        }
+        #clearScreen .marquee {
+            font-size: 0.7em;
+            padding: 15px 0;
+            white-space: nowrap;
+            overflow: hidden;
+            box-sizing: border-box;
+            animation: marquee 15s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        #clearScreen .sub-message {
+            font-size: 0.35em;
+            color: #f1c40f;
+            margin-top: 25px;
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink {
+            0%, 50%, 100% { opacity: 1; }
+            25%, 75% { opacity: 0; }
+        }
+
+        #hiddenClear {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 9999;
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            animation: hiddenClearBg 10s infinite alternate;
+            overflow: hidden;
+        }
+
+        @keyframes hiddenClearBg {
+            0% { background-color: #0a0a0a; }
+            25% { background-color: #2b0a3a; }
+            50% { background-color: #0a2b3a; }
+            75% { background-color: #2b3a0a; }
+            100% { background-color: #0a0a0a; }
+        }
+
+        #hiddenClearCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        #hiddenClearTextContainer {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            font-size: 4.5em;
+            font-weight: bold;
+            text-shadow: 0 0 30px #fff, 0 0 60px #f0f, 0 0 90px #0ff, 0 0 120px #ff0;
+            animation: textSparkle 1.5s infinite alternate;
+        }
+
+        @keyframes textSparkle {
+            0% { text-shadow: 0 0 30px #fff, 0 0 60px #f0f, 0 0 90px #0ff, 0 0 120px #ff0; }
+            50% { text-shadow: 0 0 40px #fff, 0 0 80px #f0f, 0 0 120px #0ff, 0 0 160px #ff0, 0 0 200px rgba(255,255,255,0.8); }
+            100% { text-shadow: 0 0 30px #fff, 0 0 60px #f0f, 0 0 90px #0ff, 0 0 120px #ff0; }
+        }
+
+        #hiddenClear .sub-message {
+            font-size: 0.5em;
+            margin-top: 40px;
+            color: #f1c40f;
+            text-shadow: 0 0 10px #f1c40f;
+            animation: subMessagePulse 2s infinite ease-in-out;
+        }
+
+        @keyframes subMessagePulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.05); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+
+        #adminPanel {
+            position: fixed;
+            top: 50%;
+            right: 0;
+            transform: translateY(-50%) translateX(100%);
+            background: #1a2a3a;
+            border: 2px solid #f1c40f;
+            border-top-left-radius: 12px;
+            border-bottom-left-radius: 12px;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            box-shadow: 0 0 20px rgba(241, 196, 15, 0.5);
+            color: #ecf0f1;
+            padding: 20px;
+            width: 280px;
+            z-index: 1001;
+            display: none;
+            text-align: left;
+            transition: transform 0.3s ease-out;
+        }
+        #adminPanel.open {
+            transform: translateY(-50%) translateX(0);
+        }
+
+        #adminPanel h3 {
+            color: #f1c40f;
+            margin-bottom: 20px;
+            font-size: 2em;
+        }
+        #adminPanel button {
+            background-color: #e67e22;
+            margin-bottom: 8px;
+            width: 100%;
+            padding: 10px 15px;
+            font-size: 0.95em;
+        }
+        #adminPanel button:hover { background-color: #d35400; }
+        #adminPanel #passwordList {
+            background-color: #0a1a2a;
+            border: 1px solid #7f8c8d;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 15px;
+            max-height: 150px;
+            overflow-y: auto;
+            color: #bdc3c7;
+            font-size: 1em;
+        }
+        #adminPanel #passwordList ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        #adminPanel #passwordList li {
+            padding: 4px 0;
+            border-bottom: 1px dashed rgba(127,140,141,0.3);
+        }
+        #adminPanel #passwordList li:last-child {
+            border-bottom: none;
+        }
+
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 15px 0;
+            font-size: 1.1em;
+            cursor: pointer;
+        }
+
+        .toggle-switch input[type="checkbox"] {
+            display: none;
+        }
+
+        .toggle-switch .slider {
+            width: 50px;
+            height: 26px;
+            background-color: #ccc;
+            border-radius: 26px;
+            position: relative;
+            cursor: pointer;
+            transition: background-color 0.4s;
+        }
+
+        .toggle-switch .slider:before {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: white;
+            top: 3px;
+            left: 3px;
+            transition: transform 0.4s;
+        }
+
+        .toggle-switch input[type="checkbox"]:checked + .slider {
+            background-color: #2196F3;
+        }
+
+        .toggle-switch input[type="checkbox"]:checked + .slider:before {
+            transform: translateX(24px);
+        }
+
+        .success-gauge-container {
+            width: 100%;
+            background-color: #444;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            overflow: hidden;
+            border: 1px solid #777;
+            box-shadow: inset 0 0 5px rgba(0,0,0,0.5);
+        }
+
+        .success-gauge-fill {
+            height: 20px;
+            background: linear-gradient(to right, #2ecc71, #f1c40f);
+            width: 0%;
+            border-radius: 10px;
+            transition: width 0.5s ease-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-weight: bold;
+            font-size: 0.9em;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.7);
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2em; }
+            #money, #upgradeLevel { font-size: 1.8em; }
+            #upgradeDisplay { width: 120px; height: 120px; font-size: 3.5em; }
+            #successRate { font-size: 1.2em; }
+            #buttonContainer { gap: 5px; max-width: none; }
+            button { padding: 8px 12px; font-size: 0.9em; }
+            .modal { max-width: 95%; padding: 20px; }
+            .modal h3 { font-size: 1.6em; }
+            .modal div { font-size: 0.95em; }
+            .modal button { padding: 8px 12px; font-size: 0.95em; }
+            .selectable label { padding: 6px 10px; font-size: 0.9em; }
+            #combine .modal-content-flex { flex-direction: column; }
+            #adminPanel { width: 250px; padding: 15px; }
+            #adminPanel h3 { font-size: 1.8em; }
+            #adminPanel button { font-size: 0.9em; }
+            #passwordList { font-size: 0.9em; }
+        }
+
+    </style>
+</head>
+<body>
+    <button id="adminToggleBtn" onclick="toggleAdminPanel()" style="display: block;">🔒 관리자 패널</button>
+
+    <h1>🌟 큐브 강화 게임 🌟</h1>
+    <div id="money">💰 현재 돈: 427,100원</div>
+    <div id="upgradeLevel">🔰 강화 단계: 25</div>
+    <div id="upgradeDisplay" onclick="openPasswordModal()" style="background: rgb(26, 230, 182);">25</div>
+    <div id="successRate">📈 성공 확률: 14.75%</div>
+    <br>
+    <div id="buttonContainer">
+        <button id="earnBtn" onclick="clickToEarn()">클릭하여 100원 획득</button>
+        <button id="upgradeBtn" onclick="attemptUpgrade()">강화 시도 (1000원)</button>
+        <button id="sellBtn" onclick="sell()">🔄 판매하기</button>
+        <button id="shopBtn" onclick="openModal('shop')">🏪 상점</button>
+        <button id="immunityBtn" onclick="useImmunity()" disabled="">🛡 실패 면제권 사용</button>
+        <button id="inventoryBtn" onclick="openModal('inventory')">🎒 인벤토리</button>
+        <button id="storeBtn" onclick="storeCube()">📦 보관하기</button>
+        <button id="combineBtn" onclick="openModal('combine')">🔗 조합</button>
+        <button id="loadBtn" onclick="openModal('load')">📥 불러오기</button>
+        <button id="settingsBtn" onclick="openModal('settingsModal')">⚙️ 설정</button>
+    </div>
+    <div id="message" class="">강화 실패했지만 면제권 자동 사용으로 단계 유지!</div>
+
+    <div id="clearScreen" style="display: none;">
+        <div class="marquee">🏆🎉 축하합니다! 게임을 클리어했습니다! 🎉🏆</div>
+        <div class="sub-message">다시 시작하려면 F5 또는 Ctrl+R</div>
+    </div>
+
+    <div id="hiddenClear" style="display: none;">
+        <canvas id="hiddenClearCanvas" width="982" height="738"></canvas>
+        <div id="hiddenClearTextContainer">✨🎉 HIDDEN CLEAR! 🎉✨</div>
+        <div class="sub-message">이것은... 당신의 상상을 초월하는 결과입니다!</div>
+    </div>
+
+    <div id="shop" class="modal" style="display: none;">
+        <h3>🏪 상점</h3>
+        <div>실패 면제권 (8000원): 실패 시 직전 단계로 복구 <button onclick="buyImmunity()">구매</button></div>
+        <div>부스트 (30000원): 다음 10회 강화 확률 2.5배 <button onclick="buyBoost()">구매</button></div>
+        <button onclick="closeModal('shop')">닫기</button>
+    </div>
+
+    <div id="inventory" class="modal" style="display: none;">
+        <h3>🎒 인벤토리</h3>
+        <div>50강의 큐브: <span id="item50" class="item-status">✅ 획득</span></div>
+        <div>미지의 운: <span id="itemLuck" class="item-status">✅ 획득</span></div>
+        <div>30강의 부스터: <span id="itemB30" class="item-status">✅ 획득</span></div>
+        <div>이상한 50강: <span id="itemW50" class="item-status">✅ 획득</span></div>
+        <div style="margin-top:20px;">
+            보관 큐브(단계별): <span id="itemStored" class="item-status">0, 0, 50, 50</span>
+        </div>
+        <div>
+            연결된 큐브(단계별): <span id="itemConnected" class="item-status">없음</span>
+        </div>
+        <div id="linkItemDisplay" style="display: block;">
+            연결 고리: <span id="itemLink" class="item-status">✅ 획득 (X개)</span>
+        </div>
+        <div id="boosterQuestionDisplay" style="display: block;">
+            어쩌다 부스터?: <span id="itemBoosterQuestion" class="item-status">✅ 획득 (X개)</span>
+        </div>
+        <div id="hidden100Display" style="display: block;"> (히든)100강 큐브: <span id="itemHidden100" class="item-status">❌ 미획득</span>
+        </div>
+        <div>돈: <span id="itemMoney" class="missing">부족</span></div>
+        <h3 style="margin-top:30px;">✅ 클리어 조건</h3>
+        <div>• 50강의 큐브 획득</div>
+        <div>• 돈 1,000,000원 이상</div>
+        <div>• 미지의 운 획득</div>
+        <div>• 30강의 부스터 획득</div>
+        <div>• 이상한 50강 획득</div>
+        <button id="clearBtn" onclick="tryClear()" disabled="">🏆 클리어</button>
+        <button onclick="closeModal('inventory')">닫기</button>
+    </div>
+
+    <div id="combine" class="modal" style="display: none;">
+        <h3>🔗 아이템 조합</h3>
+        <div class="modal-content-flex">
+            <div><strong>첫 번째 아이템:</strong><div id="comb1" class="selectable"></div></div>
+            <div><strong>두 번째 아이템:</strong><div id="comb2" class="selectable"></div></div>
+        </div>
+        <button onclick="combineItems()">조합 실행</button>
+        <button id="closeCombineModalBtn" onclick="closeModal('combine')">닫기</button>
+    </div>
+
+    <div id="load" class="modal" style="display: none;">
+        <h3>📥 보관 큐브 불러오기</h3>
+        <div><strong>선택:</strong><div id="loadSel" class="selectable"></div></div>
+        <button onclick="loadCube()">확인</button>
+        <button id="closeLoadModalBtn" onclick="closeModal('load')">닫기</button>
+    </div>
+
+    <div id="passwordModal" class="modal" style="display: none;">
+        <h3>🔑 비밀번호 입력</h3>
+        <input type="text" id="passwordInput" placeholder="비밀번호를 입력하세요...">
+        <button onclick="checkPassword()">확인</button>
+        <button onclick="closeModal('passwordModal')">닫기</button>
+    </div>
+
+    <div id="settingsModal" class="modal" style="display: none;">
+        <h3>⚙️ 설정</h3>
+        <div class="success-gauge-container">
+            <div class="success-gauge-fill" id="settingsSuccessGauge"></div>
+        </div>
+        <label class="toggle-switch">
+            <span>면제권 자동 사용</span>
+            <input type="checkbox" id="autoImmunityToggle" onchange="toggleAutoImmunity()">
+            <span class="slider"></span>
+        </label>
+        <label class="toggle-switch">
+            <span>강화 애니메이션 효과</span>
+            <input type="checkbox" id="animationToggle" onchange="toggleAnimation()">
+            <span class="slider"></span>
+        </label>
+        <button onclick="openModal('resetConfirmModal')" style="background-color: #c0392b;">⚠️ 게임 초기화</button>
+        <button onclick="closeModal('settingsModal')">닫기</button>
+    </div>
+
+    <div id="resetConfirmModal" class="modal" style="display: none;">
+        <h3>⚠️ 게임 초기화</h3>
+        <div>정말로 게임을 초기화하시겠습니까?</div>
+        <div>모든 진행 상황과 아이템이 사라집니다!</div>
+        <button onclick="resetGameConfirmed()">네, 초기화합니다.</button>
+        <button onclick="closeModal('resetConfirmModal')">아니요, 취소합니다.</button>
+    </div>
+
+    <div id="adminPanel" class="modal" style="display: none;">
+        <h3>🔒 관리자 패널</h3>
+        <div id="passwordList">
+            <p><strong>✅ 등록된 비밀번호 목록 (참고용)</strong></p>
+            <ul>
+                <li>뭙볽홁관리자</li>
+                <li>황도윤천재[n] (n은 0-50)</li>
+                <li>이지우천재</li>
+                <li>쨈민이모촹</li>
+                <li>연결고리!</li>
+                <li>미지의 운</li>
+                <li>30강부스터 (이제 직접 획득X, 조합으로만)</li>
+                <li>어쩌다부스터!</li>
+                <li>이상한50강 (이제 직접 획득X, 특정 강화 조건으로만)</li>
+            </ul>
+        </div>
+        <button onclick="adminAddMoney()">💰 돈 1,000,000원 추가</button>
+        <button onclick="adminSetLevel()">👑 강화 단계 50으로 설정</button>
+        <button onclick="adminGetAllItems()">🎁 모든 클리어 아이템 획득</button>
+        <button onclick="adminAddImmunity()">🛡 면제권 10개 추가</button>
+        <button onclick="adminAddLink()">🔗 연결 고리 5개 추가</button>
+        <button onclick="adminAddBoosterQuestion()">❓ 어쩌다 부스터? 1개 추가</button>
+        <button onclick="adminAddHidden100()">💯 (히든)100강 큐브 추가</button> <button onclick="toggleAdminPanel()">✖ 닫기</button>
+    </div>
+
+<script>
+    const MAX_LEVEL = 50;
+
+    const colors = [
+        "red","orange","yellow","green","blue","indigo","violet",
+        ...Array(MAX_LEVEL - 6).fill(0).map((_,i)=>`hsl(${(i * 7 + 40)%360},80%,50%)`)
+    ];
+    colors[MAX_LEVEL] = "gray";
+
+    let money = 100;
+    let level = 0;
+    let immunity = 0;
+    let boost = 0;
+    let lastUpgradeSuccess = true;
+    let autoImmunity = false;
+    let enableAnimation = true;
+
+    let has50 = false;
+    let hasLuck = false; // 미지의 운 (1회 획득)
+    let hasB30 = false; // 30강의 부스터 (1회 획득 - 조합으로만)
+    let hasW50 = false; // 이상한 50강 (1회 획득 - 특정 강화 조건으로만)
+    let linkCount = 0; // 연결 고리 개수 (무한 획득 가능)
+    let hasBoosterQuestion = false; // 어쩌다 부스터? (1회 획득)
+
+    let hasHidden100 = false; // (히든)100강 큐브 (1회 획득)
+
+    const storedCubes = []; // 보관 큐브
+    const connectedCubes = []; // {level: N, id: M} 형태로 저장되는 연결된 큐브
+    let connectedIdCounter = 0; // 연결된 큐브의 고유 ID 부여를 위한 카운터
+
+    let successHistory = []; // 연결고리 획득을 위한 강화 성공/실패 기록
+
+    let selectedCombineA = null; // 조합 시 선택된 첫 번째 아이템
+    let selectedCombineB = null; // 조합 시 선택된 두 번째 아이템
+    let selectedLoadIndex = null; // 불러오기 시 선택된 보관 큐브 인덱스
+
+    const canvas = document.getElementById('hiddenClearCanvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+    let animationFrameId;
+
+    // 모달 닫기 버튼 위 마우스 상태 플래그
+    let isMouseOverModalCloseButton = false;
+
+    function initGame() {
+        loadGame();
+        
+        if (money === undefined || level === undefined) {
+            resetGameData(); // 초기화 함수 호출
+        }
+
+        document.getElementById('clearScreen').style.display = 'none';
+        document.getElementById('hiddenClear').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'none';
+        document.getElementById('adminPanel').classList.remove('open');
+        document.getElementById('adminToggleBtn').style.display = 'none';
+
+        document.getElementById('autoImmunityToggle').checked = autoImmunity;
+        document.getElementById('animationToggle').checked = enableAnimation;
+
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+            particles = [];
+        }
+
+        updateUI();
+        showMessage('게임을 시작합니다!');
+
+        // 닫기 버튼에 이벤트 리스너 추가 (조합, 불러오기 모달)
+        document.getElementById('closeCombineModalBtn').addEventListener('mouseenter', () => isMouseOverModalCloseButton = true);
+        document.getElementById('closeCombineModalBtn').addEventListener('mouseleave', () => isMouseOverModalCloseButton = false);
+
+        document.getElementById('closeLoadModalBtn').addEventListener('mouseenter', () => isMouseOverModalCloseButton = true);
+        document.getElementById('closeLoadModalBtn').addEventListener('mouseleave', () => isMouseOverModalCloseButton = false);
+
+    }
+
+    function showMessage(text) {
+        const messageEl = document.getElementById('message');
+        messageEl.innerText = text;
+        messageEl.classList.add('show');
+        clearTimeout(messageEl.messageTimeout);
+        messageEl.messageTimeout = setTimeout(() => {
+            messageEl.classList.remove('show');
+        }, 3000);
+    }
+
+    function openModal(id) {
+        document.querySelectorAll('.modal').forEach(m => {
+            m.style.display = 'none';
+        });
+        const modal = document.getElementById(id);
+        modal.style.display = 'block';
+
+        if (id === 'settingsModal') {
+            updateUI();
+        } else if (id === 'combine') {
+            showCombine();
+        } else if (id === 'load') {
+            showLoad();
+        } else if (id === 'passwordModal') {
+            document.getElementById('passwordInput').value = '';
+            document.getElementById('passwordInput').focus();
+        } else if (id === 'inventory') {
+            document.getElementById('linkItemDisplay').style.display = linkCount > 0 ? 'block' : 'none';
+            document.getElementById('boosterQuestionDisplay').style.display = hasBoosterQuestion ? 'block' : 'none';
+            document.getElementById('hidden100Display').style.display = 'block'; // Always display, status determines content
+        }
+    }
+
+    function closeModal(id) {
+        const modal = document.getElementById(id);
+        modal.style.display = 'none';
+        saveGame();
+    }
+
+    function updateUI() {
+        document.getElementById('money').innerText = `💰 현재 돈: ${money.toLocaleString()}원`;
+        document.getElementById('upgradeLevel').innerText = `🔰 강화 단계: ${level}`;
+
+        const upgradeDisplay = document.getElementById('upgradeDisplay');
+        upgradeDisplay.innerText = level;
+        upgradeDisplay.style.background = colors[Math.min(level, MAX_LEVEL)];
+
+        let successRate = Math.pow(0.9263, level);
+        if (boost > 0) {
+            successRate *= 2.5;
+            // boost--; // 부스트는 횟수 차감은 강화 시도 함수에서만!
+        }
+        successRate = Math.min(successRate, 1);
+        document.getElementById('successRate').innerText = `📈 성공 확률: ${(successRate * 100).toFixed(2)}%`;
+
+        const settingsSuccessGauge = document.getElementById('settingsSuccessGauge');
+        settingsSuccessGauge.style.width = `${(successRate * 100).toFixed(2)}%`;
+        settingsSuccessGauge.innerText = `${(successRate * 100).toFixed(0)}%`;
+
+
+        const isClearScreenActive = document.getElementById('clearScreen').style.display === 'flex';
+        const isHiddenClearActive = document.getElementById('hiddenClear').style.display === 'flex';
+
+        const allButtons = document.querySelectorAll('button');
+        allButtons.forEach(button => {
+            if (button.id === 'adminToggleBtn' || (button.onclick && (button.onclick.toString().includes("openModal(") || button.onclick.toString().includes("closeModal("))) || button.id === 'clearBtn') {
+                button.disabled = false;
+            } else {
+                button.disabled = isClearScreenActive || isHiddenClearActive;
+            }
+        });
+
+        if (!isClearScreenActive && !isHiddenClearActive) {
+            document.getElementById('upgradeBtn').disabled = money < 1000;
+            document.getElementById('immunityBtn').disabled = immunity <= 0 || lastUpgradeSuccess;
+            document.getElementById('sellBtn').disabled = level < 2;
+
+            document.getElementById('item50').className = has50 ? 'item-status' : 'item-status missing';
+            document.getElementById('item50').innerText = has50 ? '✅ 획득' : '❌ 미획득';
+            document.getElementById('itemLuck').className = hasLuck ? 'item-status' : 'item-status missing';
+            document.getElementById('itemLuck').innerText = hasLuck ? '✅ 획득' : '❌ 미획득';
+            document.getElementById('itemB30').className = hasB30 ? 'item-status' : 'item-status missing';
+            document.getElementById('itemB30').innerText = hasB30 ? '✅ 획득' : '❌ 미획득';
+            document.getElementById('itemW50').className = hasW50 ? 'item-status' : 'item-status missing';
+            document.getElementById('itemW50').innerText = hasW50 ? '✅ 획득' : '❌ 미획득';
+            
+            document.getElementById('linkItemDisplay').style.display = linkCount > 0 ? 'block' : 'none';
+            document.getElementById('itemLink').className = linkCount > 0 ? 'item-status' : 'item-status missing'; 
+            document.getElementById('itemLink').innerText = `✅ 획득 (${linkCount}개)`;
+
+            document.getElementById('boosterQuestionDisplay').style.display = hasBoosterQuestion ? 'block' : 'none';
+            document.getElementById('itemBoosterQuestion').className = hasBoosterQuestion ? 'item-status' : 'item-status missing';
+            document.getElementById('itemBoosterQuestion').innerText = hasBoosterQuestion ? '✅ 획득 (1개)' : '❌ 미획득';
+
+            document.getElementById('itemHidden100').className = hasHidden100 ? 'item-status' : 'item-status missing';
+            document.getElementById('itemHidden100').innerText = hasHidden100 ? '✅ 획득' : '❌ 미획득';
+            
+            document.getElementById('itemMoney').className = money >= 1000000 ? 'item-status' : 'item-status missing';
+            document.getElementById('itemMoney').innerText = money >= 1000000 ? '✅ 충분' : '❌ 부족';
+
+            document.getElementById('itemStored').innerText = storedCubes.length > 0 ? storedCubes.map(c => `${c}강`).join(', ') : '없음';
+            document.getElementById('itemConnected').innerText = connectedCubes.length > 0 ? connectedCubes.map(c => `${c.level}강 (ID: ${c.id})`).join(', ') : '없음';
+
+
+            const clearConditionsMet = has50 && money >= 1000000 && hasLuck && hasB30 && hasW50;
+            document.getElementById('clearBtn').disabled = !clearConditionsMet;
+        }
+
+        document.getElementById('autoImmunityToggle').checked = autoImmunity;
+        document.getElementById('animationToggle').checked = enableAnimation;
+    }
+
+    function clickToEarn() {
+        money += 100;
+        updateUI();
+        showMessage('100원 획득!');
+        saveGame();
+    }
+
+    function attemptUpgrade() {
+        if (money < 1000) {
+            showMessage('돈이 부족합니다! 강화에 1000원이 필요합니다.');
+            return;
+        }
+
+        money -= 1000;
+        let upgradeResult = false;
+
+        let successRate = Math.pow(0.9263, level);
+        if (boost > 0) {
+            successRate *= 2.5;
+            boost--;
+        }
+
+        const chance = Math.random();
+
+        if (chance < successRate) {
+            level++;
+            upgradeResult = true;
+            lastUpgradeSuccess = true;
+            showMessage(`강화 성공! 현재 ${level}강!`);
+            if (enableAnimation) {
+                animateCubeColor('success');
+            }
+            // 어쩌다 부스터? 획득 (강화 성공 시)
+            if (!hasBoosterQuestion && level === 30 && lastUpgradeSuccess) {
+                hasBoosterQuestion = true;
+                showMessage('아이템 "어쩌다 부스터?"를 획득했습니다!');
+            }
+
+            // 이상한 50강 획득 (50강 달성 시)
+            if (level === 50 && !hasW50) {
+                hasW50 = true;
+                showMessage('아이템 "이상한 50강"을 획득했습니다!');
+            }
+            
+        } else {
+            upgradeResult = false;
+            lastUpgradeSuccess = false;
+            if (autoImmunity && immunity > 0) {
+                immunity--;
+                showMessage('강화 실패했지만 면제권 자동 사용으로 단계 유지!');
+            } else if (immunity > 0 && !autoImmunity) {
+                // 면제권 수동 사용 시 강화 실패해도 단계 유지
+                showMessage('강화 실패! 면제권을 사용하려면 버튼을 누르세요!');
+            } else {
+                level = Math.max(0, level - 1);
+                showMessage(`강화 실패! 현재 ${level}강!`);
+            }
+            if (enableAnimation) {
+                animateCubeColor('fail');
+            }
+        }
+
+        // 연결 고리 획득 로직
+        successHistory.push(upgradeResult);
+        if (successHistory.length > 5) { // 최근 5회만 기록
+            successHistory.shift();
+        }
+
+        // 5연속 성공 또는 5연속 실패 시 연결 고리 획득
+        if (successHistory.length === 5) {
+            const allSuccess = successHistory.every(result => result === true);
+            const allFail = successHistory.every(result => result === false);
+            if (allSuccess || allFail) {
+                linkCount++;
+                showMessage('아이템 "연결 고리"를 획득했습니다!');
+                successHistory = []; // 연결 고리 획득 시 기록 초기화
+            }
+        }
+        
+        updateUI();
+        saveGame();
+    }
+
+    function sell() {
+        if (level < 2) {
+            showMessage('2강부터 판매할 수 있습니다.');
+            return;
+        }
+        const sellPrice = level * 2000;
+        money += sellPrice;
+
+        // ------ 50강 큐브 판매 시 50만원 보너스 추가 로직 ------
+        if (level === 50) { // 현재 강화 레벨이 50인지 확인
+            money += 500000; // 50만원 추가
+           showMessage('50강 큐브 판매! 50만원도 보~너~스');
+       }
+        // ------------------------------------------------------------------
+
+        level = 0; // 판매 후 레벨을 0으로 초기화
+        showMessage(`${sellPrice}원에 판매! 큐브가 0강이 되었습니다.`);
+        updateUI(); // UI 업데이트
+        saveGame(); // 게임 상태 저장
+    }
+
+    function buyImmunity() {
+        if (money >= 8000) {
+            money -= 8000;
+            immunity++;
+            showMessage('실패 면제권을 구매했습니다!');
+            updateUI();
+            saveGame();
+        } else {
+            showMessage('돈이 부족합니다!');
+        }
+    }
+
+    function buyBoost() {
+        if (money >= 30000) {
+            money -= 30000;
+            boost += 10;
+            showMessage('부스트를 구매했습니다! 다음 10회 강화 확률 2.5배!');
+            updateUI();
+            saveGame();
+        } else {
+            showMessage('돈이 부족합니다!');
+        }
+    }
+
+    function useImmunity() {
+        if (!lastUpgradeSuccess && immunity > 0) {
+            immunity--;
+            lastUpgradeSuccess = true; // 면제권 사용 후에는 마지막 강화 성공으로 간주하여 재사용 방지
+            showMessage('실패 면제권을 사용하여 강화 단계를 유지합니다!');
+            updateUI();
+            saveGame();
+        } else if (lastUpgradeSuccess) {
+            showMessage('이전 강화가 성공했거나 이미 면제권을 사용했습니다.');
+        } else {
+            showMessage('실패 면제권이 없습니다.');
+        }
+    }
+
+    function storeCube() {
+        if (storedCubes.length >= 10) {
+            showMessage('보관함이 가득 차 있어 조합 결과를 저장할 수 없습니다.');
+            return;
+        }
+        storedCubes.push(level);
+        level = 0;
+        showMessage(`현재 큐브(${level}강)를 보관했습니다.`);
+        updateUI();
+        saveGame();
+    }
+
+    function showLoad() {
+        const loadSelDiv = document.getElementById('loadSel');
+        loadSelDiv.innerHTML = '';
+        selectedLoadIndex = null; // 선택 초기화
+
+        if (storedCubes.length === 0) {
+            loadSelDiv.innerHTML = '<p>보관된 큐브가 없습니다.</p>';
+            return;
+        }
+
+
+        storedCubes.forEach((cubeLevel, index) => {
+            const label = document.createElement('label');
+            const radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = 'loadCube';
+            radio.value = index;
+            radio.onchange = () => {
+                selectedLoadIndex = index;
+                // 모든 label의 selected 클래스 제거
+                document.querySelectorAll('#loadSel label').forEach(l => l.classList.remove('selected'));
+                // 현재 선택된 label에 selected 클래스 추가
+                label.classList.add('selected');
+            };
+            
+            label.appendChild(radio);
+            label.appendChild(document.createTextNode(`${cubeLevel}강 큐브`));
+            loadSelDiv.appendChild(label);
+
+            // 마우스 이벤트 리스너 추가
+            label.addEventListener('mouseenter', () => {
+                if (label.querySelector('input').checked) {
+                    label.classList.add('selected');
+                }
+            });
+            label.addEventListener('mouseleave', () => {
+                if (!label.querySelector('input').checked && !isMouseOverModalCloseButton) { // 닫기 버튼 위에 있지 않을 때만 해제
+                    label.classList.remove('selected');
+                }
+            });
+        });
+    }
+
+    function loadCube() {
+            if (selectedLoadIndex !== null) {
+            if (level !== 0) {
+                if (storedCubes.length >= 10) {
+                    showMessage('보관함이 가득 차 있어 현재 큐브를 보관할 수 없습니다.');
+                    return;
+                }
+                storedCubes.push(level);  // 현재 큐브 보관
+                showMessage(`현재 ${level}강 큐브를 보관함에 저장했습니다.`);
+            }
+
+            level = storedCubes[selectedLoadIndex];  // 보관된 큐브 불러오기
+            storedCubes.splice(selectedLoadIndex, 1); // 삭제
+
+            showMessage(`보관된 ${level}강 큐브를 불러왔습니다.`);
+            closeModal('load');
+            updateUI();
+            saveGame();
+        } else {
+            showMessage('불러올 큐브를 선택해주세요.');
+        }
+    }
+
+
+    function showCombine() {
+        const comb1Div = document.getElementById('comb1');
+        const comb2Div = document.getElementById('comb2');
+        comb1Div.innerHTML = '';
+        comb2Div.innerHTML = '';
+        selectedCombineA = null;
+        selectedCombineB = null;
+
+        const availableItems = [
+            ...storedCubes.map((l, idx) => ({ type: 'stored', level: l, label: `보관 큐브 (${l}강)`, index: idx })),
+            ...connectedCubes.map(c => ({ type: 'connected', level: c.level, id: c.id, label: `연결된 큐브 (${c.level}강 ID:${c.id})` })),
+            ...(linkCount > 0 ? Array(linkCount).fill({ type: 'item', name: '연결고리', label: `아이템: 연결 고리` }) : []),
+            ...(hasLuck ? [{ type: 'item', name: '미지의운', label: `아이템: 미지의 운` }] : []),
+            ...(hasB30 ? [{ type: 'item', name: '30강부스터', label: `아이템: 30강의 부스터` }] : []),
+            ...(hasBoosterQuestion ? [{ type: 'item', name: '어쩌다부스터', label: `아이템: 어쩌다 부스터?` }] : []),
+        ];
+
+        function createRadioButtons(container, groupName, selectVar) {
+            availableItems.forEach((item, index) => {
+                const label = document.createElement('label');
+                const radio = document.createElement('input');
+                radio.type = 'radio';
+                radio.name = groupName;
+                radio.value = index;
+                radio.onchange = () => {
+                    if (groupName === 'combineA') {
+                        selectedCombineA = item;
+                    } else {
+                        selectedCombineB = item;
+                    }
+                    // 모든 label의 selected 클래스 제거
+                    document.querySelectorAll(`#${container.id} label`).forEach(l => l.classList.remove('selected'));
+                    // 현재 선택된 label에 selected 클래스 추가
+                    label.classList.add('selected');
+                };
+
+                label.appendChild(radio);
+                label.appendChild(document.createTextNode(item.label));
+                container.appendChild(label);
+
+                // 마우스 이벤트 리스너 추가
+                label.addEventListener('mouseenter', () => {
+                    if (label.querySelector('input').checked) {
+                        label.classList.add('selected');
+                    }
+                });
+                label.addEventListener('mouseleave', () => {
+                    if (!label.querySelector('input').checked && !isMouseOverModalCloseButton) { // 닫기 버튼 위에 있지 않을 때만 해제
+                        label.classList.remove('selected');
+                    }
+                });
+            });
+        }
+        
+        createRadioButtons(comb1Div, 'combineA', 'selectedCombineA');
+        createRadioButtons(comb2Div, 'combineB', 'selectedCombineB');
+    }
+
+    function combineItems() {
+        if (!selectedCombineA || !selectedCombineB) {
+            showMessage('두 개의 아이템을 선택해주세요.');
+            return;
+        }
+
+        // 같은 아이템을 선택했는지 확인 (현재 큐브는 예외)
+        if (selectedCombineA.type === selectedCombineB.type) {
+            if (selectedCombineA.type === 'current' || selectedCombineB.type === 'current') {
+                // 현재 큐브는 항상 하나밖에 없으므로, 같은 "현재 큐브"를 두 번 선택하는 건 불가능.
+                // 만약 동일한 저장 큐브나 연결 큐브를 선택했는지 확인하려면 추가 로직 필요.
+                // 현재 로직에서는 `selectedCombineA`와 `selectedCombineB`가 같은 객체를 참조할 경우를 방지해야 함.
+                if (selectedCombineA === selectedCombineB) {
+                    showMessage('같은 아이템을 두 번 선택할 수 없습니다.');
+                    return;
+                }
+            } else if (selectedCombineA.type === 'item' && selectedCombineA.name === selectedCombineB.name && selectedCombineA.name !== '연결고리') {
+                showMessage('같은 특별 아이템을 두 번 선택할 수 없습니다. (연결 고리는 여러 개 가능)');
+                return;
+            }
+        }
+
+
+
+        // 연결고리 + 보관 큐브 조합
+        if (
+            (selectedCombineA.type === 'item' && selectedCombineA.name === '연결고리' && selectedCombineB.type === 'stored') ||
+            (selectedCombineB.type === 'item' && selectedCombineB.name === '연결고리' && selectedCombineA.type === 'stored')
+        ) {
+            const cube = selectedCombineA.type === 'stored' ? selectedCombineA : selectedCombineB;
+
+            connectedCubes.push({
+                level: cube.level,
+                id: cube.index
+            });
+
+            // 보관 큐브 삭제
+            storedCubes.splice(cube.index, 1);
+            linkCount--;
+
+            showMessage(`${cube.level}강 큐브를 연결했습니다!`);
+            closeModal('combine');
+            updateUI();
+            saveGame();
+            return;
+        }
+        
+        // 어쩌다 부스터? + 30강 보관 큐브 → 30강의 부스터 생성
+        if (
+            hasBoosterQuestion &&
+            selectedCombineA.type === 'item' && selectedCombineA.name === '어쩌다부스터' &&
+            selectedCombineB.type === 'stored' && selectedCombineB.level === 30
+            ||
+            hasBoosterQuestion &&
+            selectedCombineB.type === 'item' && selectedCombineB.name === '어쩌다부스터' &&
+            selectedCombineA.type === 'stored' && selectedCombineA.level === 30
+        ) {
+            hasBoosterQuestion = false;
+            hasB30 = true;
+
+       // 30강 큐브 제거
+       const index = storedCubes.findIndex(lv => lv === 30);
+       if (index !== -1) storedCubes.splice(index, 1);
+
+       showMessage('조합 성공! "30강의 부스터"를 획득했습니다!');
+       closeModal('combine');
+       updateUI();
+       saveGame();
+       return;
+   }
+
+// 연결된 큐브끼리 조합
+if (selectedCombineA.type === 'connected' && selectedCombineB.type === 'connected') {
+    const levelA = selectedCombineA.level;
+    const levelB = selectedCombineB.level;
+
+    // 히든 100강 조합 조건
+    if (levelA === 50 && levelB === 50 && !hasHidden100) {
+        hasHidden100 = true;
+        showMessage('전설의 조합 성공! 히든 100강 큐브를 획득했습니다!');
+        closeModal('combine');
+        updateUI();
+        saveGame();
+        return;
+    }
+    if (storedCubes.length >= 10) {
+        showMessage('보관함이 가득 차 있어 조합 결과를 저장할 수 없습니다.');
+        return;
+    }
+    // 일반 연결 큐브 조합
+    let resultLevel = levelA + levelB;
+    if (resultLevel > 50) resultLevel = 50;
+
+    storedCubes.push(resultLevel);
+
+    // 연결 큐브 제거 (두 개 다 제거해야 하므로 index 조심)
+    const ids = [selectedCombineA.id, selectedCombineB.id].sort((a, b) => b - a);
+    ids.forEach(id => connectedCubes.splice(id, 1));
+
+    showMessage(`연결된 ${levelA}강 + ${levelB}강을 조합하여 ${resultLevel}강 큐브를 획득했습니다!`);
+    closeModal('combine');
+    updateUI();
+    saveGame();
+    return;
+}
+
+
+
+        // 4. 보관 큐브 조합
+        const isStoredCubeA = selectedCombineA.type === 'stored';
+        const isStoredCubeB = selectedCombineB.type === 'stored';
+
+        if (isStoredCubeA && isStoredCubeB) {
+            const levelA = selectedCombineA.level;
+            const levelB = selectedCombineB.level;
+
+            // 0강과 50강 큐브 조합 예외 처리
+            if ((levelA === 0 && levelB === 50) || (levelA === 50 && levelB === 0)) {
+                if (!hasW50) { // 이상한 50강이 아직 없는 경우에만 획득
+                    hasW50 = true;
+                    // 사용된 보관 큐브 제거
+                    const indicesToRemove = [selectedCombineA.index, selectedCombineB.index].sort((a,b)=>b-a); // 큰 인덱스부터 제거
+                    storedCubes.splice(indicesToRemove[0], 1);
+                    storedCubes.splice(indicesToRemove[1], 1);
+                    showMessage('0강 큐브와 50강 큐브를 조합하여 "이상한 50강"을 획득했습니다!');
+                    closeModal('combine');
+                    updateUI();
+                    saveGame();
+                    return;
+                } else {
+                    showMessage('이미 "이상한 50강"을 획득했습니다. 더 이상 조합할 수 없습니다.');
+                    return;
+                }
+            }
+            
+            // 그 외 일반 큐브 조합 불가능
+            showMessage('조합 할 수 없는 조합법입니다.');
+            return;
+        }
+
+        // 그 외의 경우 조합 불가
+        showMessage('조합할 수 없는 아이템 조합입니다.');
+    }
+
+
+    function tryClear() {
+        const clearConditionsMet = has50 && money >= 1000000 && hasLuck && hasB30 && hasW50;
+        if (clearConditionsMet) {
+            // Check for hidden clear condition: 100강 큐브 보유
+            if (hasHidden100) {
+                startHiddenClearAnimation();
+            } else {
+                startClearScreenAnimation();
+            }
+        } else {
+            showMessage('아직 클리어 조건을 모두 충족하지 못했습니다!');
+        }
+    }
+
+    function startClearScreenAnimation() {
+        document.getElementById('clearScreen').style.display = 'flex';
+        // Disable all buttons except adminToggleBtn and current modal close buttons
+        document.querySelectorAll('button:not(#adminToggleBtn):not(.modal button[onclick*="closeModal"])').forEach(btn => btn.disabled = true);
+        
+        setTimeout(() => {
+            // Optionally, reset game or show final message
+            // resetGameData(); // Uncomment to reset game after clear
+            // window.location.reload(); // Uncomment to refresh page
+        }, 10000); // 애니메이션 지속 시간 (예: 10초)
+    }
+
+    function startHiddenClearAnimation() {
+        document.getElementById('hiddenClear').style.display = 'flex';
+        // Disable all buttons
+        document.querySelectorAll('button').forEach(btn => btn.disabled = true);
+
+        // Canvas animation for particles
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        class Particle {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.radius = Math.random() * 2 + 1;
+                this.color = `hsl(${Math.random() * 360}, 100%, 70%)`;
+                this.velocity = {
+                    x: (Math.random() - 0.5) * 5,
+                    y: (Math.random() - 0.5) * 5
+                };
+                this.alpha = 1;
+                this.friction = 0.98;
+            }
+
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+
+            update() {
+                this.velocity.x *= this.friction;
+                this.velocity.y *= this.friction;
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                this.alpha -= 0.01;
+            }
+        }
+
+        function animateParticles() {
+            animationFrameId = requestAnimationFrame(animateParticles);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            particles.forEach((particle, index) => {
+                particle.update();
+                particle.draw();
+
+                if (particle.alpha <= 0.05 || particle.radius <= 0.5) {
+                    particles.splice(index, 1);
+                }
+            });
+
+            if (Math.random() < 0.5) { // 스폰율 조절
+                particles.push(new Particle(canvas.width / 2, canvas.height / 2));
+            }
+        }
+
+        // 시작 시 약간의 파티클 생성
+        for (let i = 0; i < 50; i++) {
+            particles.push(new Particle(canvas.width / 2, canvas.height / 2));
+        }
+
+        animateParticles();
+
+        setTimeout(() => {
+            // resetGameData(); // Uncomment to reset game after hidden clear
+            // window.location.reload(); // Uncomment to refresh page
+        }, 20000); // 애니메이션 지속 시간 (예: 20초)
+    }
+
+    // Passwords for special actions
+    const passwords = {
+        "뭙볽홁관리자": () => {
+            showMessage("관리자 모드 활성화!");
+            document.getElementById('adminToggleBtn').style.display = 'block';
+            closeModal('passwordModal');
+        },
+        "황도윤천재": (levelValue) => {
+            if (!isNaN(levelValue) && levelValue >= 0 && levelValue <= 50) {
+                level = parseInt(levelValue);
+                showMessage(`강화 레벨이 ${level}로 설정되었습니다! 황도윤 천재!`);
+                updateUI();
+                closeModal('passwordModal');
+                saveGame();
+            } else {
+                showMessage("유효하지 않은 레벨입니다. (0-50)");
+            }
+        },
+        "이지우천재": () => {
+            level = MAX_LEVEL;
+            money += 100000000; // 1억 추가
+            showMessage('이지우 천재! 1억원을 획득했습니다! 단계 50강! 솔직히 지우는 천재지 ㅋㅋㅋ');
+            updateUI();
+            closeModal('passwordModal');
+            saveGame();
+        },
+        "쨈민이모촹": () => {
+            level = MAX_LEVEL;
+            showMessage('최대 강화 단계 달성! 쨈민이모 짱!');
+            updateUI();
+            closeModal('passwordModal');
+            saveGame();
+        },
+        "연결고리!": () => {
+            linkCount += 5;
+            showMessage('연결 고리 5개를 획득했습니다!');
+            updateUI();
+            closeModal('passwordModal');
+            saveGame();
+        },
+        "미지의 운": () => {
+            if (!hasLuck) {
+                hasLuck = true;
+                showMessage('아이템 "미지의 운"을 획득했습니다!');
+            } else {
+                showMessage('이미 "미지의 운"을 가지고 있습니다.');
+            }
+            updateUI();
+            closeModal('passwordModal');
+            saveGame();
+        },
+        "30강부스터": () => { // 이제 이 비밀번호는 아이템을 주지 않고, 조합에 대한 설명만.
+            showMessage('이제 "30강의 부스터"는 비밀번호로 획득할 수 없습니다. "어쩌다 부스터?"와 "연결 고리"를 조합해보세요!');
+            closeModal('passwordModal');
+        },
+        "어쩌다부스터!": () => {
+            if (!hasBoosterQuestion) {
+                hasBoosterQuestion = true;
+                showMessage('아이템 "어쩌다 부스터?"를 획득했습니다!');
+            } else {
+                showMessage('이미 "어쩌다 부스터?"를 가지고 있습니다.');
+            }
+            updateUI();
+            closeModal('passwordModal');
+            saveGame();
+        },
+        "이상한50강": () => { // 이제 이 비밀번호는 아이템을 주지 않고, 조합에 대한 설명만.
+            showMessage('이제 "이상한 50강"은 비밀번호로 획득할 수 없습니다. 0강 큐브와 50강 큐브를 조합해보세요!');
+            closeModal('passwordModal');
+        }
+    };
+
+    function openPasswordModal() {
+        openModal('passwordModal');
+    }
+
+    function checkPassword() {
+        const input = document.getElementById('passwordInput').value.trim();
+        let passwordFound = false;
+
+        // "황도윤천재[n]" 형식 처리
+        const doyunMatch = input.match(/^황도윤천재(\d+)$/);
+        if (doyunMatch) {
+            passwords["황도윤천재"](parseInt(doyunMatch[1]));
+            passwordFound = true;
+        } else if (passwords[input]) {
+            passwords[input]();
+            passwordFound = true;
+        }
+
+        if (!passwordFound) {
+            showMessage('잘못된 비밀번호입니다.');
+        }
+    }
+
+    function animateCubeColor(status) {
+        const upgradeDisplay = document.getElementById('upgradeDisplay');
+        let originalBg = colors[Math.min(level, MAX_LEVEL)];
+        let flashColor = status === 'success' ? '#2ecc71' : '#e74c3c'; // Green for success, Red for failure
+
+        upgradeDisplay.style.transition = 'none'; // Disable transition for immediate flash
+        upgradeDisplay.style.backgroundColor = flashColor;
+
+        setTimeout(() => {
+            upgradeDisplay.style.transition = 'background-color 0.3s ease-in-out'; // Re-enable transition
+            upgradeDisplay.style.backgroundColor = originalBg; // Restore original color
+        }, 100); // Flash duration
+    }
+
+    function toggleAutoImmunity() {
+        autoImmunity = document.getElementById('autoImmunityToggle').checked;
+        showMessage(`면제권 자동 사용: ${autoImmunity ? '활성화' : '비활성화'}`);
+        saveGame();
+    }
+
+    function toggleAnimation() {
+        enableAnimation = document.getElementById('animationToggle').checked;
+        showMessage(`강화 애니메이션 효과: ${enableAnimation ? '활성화' : '비활성화'}`);
+        saveGame();
+    }
+
+    function resetGameConfirmed() {
+        resetGameData();
+        closeModal('resetConfirmModal');
+        showMessage('게임이 초기화되었습니다!');
+        updateUI();
+        saveGame();
+    }
+
+    function resetGameData() {
+        money = 100;
+        level = 0;
+        immunity = 0;
+        boost = 0;
+        lastUpgradeSuccess = true;
+        autoImmunity = false;
+        enableAnimation = true; // 초기화 시 애니메이션 기본 활성화
+
+        has50 = false;
+        hasLuck = false;
+        hasB30 = false;
+        hasW50 = false;
+        linkCount = 0;
+        hasBoosterQuestion = false;
+        hasHidden100 = false; // 히든 100강 큐브도 초기화
+
+        storedCubes.length = 0;
+        connectedCubes.length = 0;
+        connectedIdCounter = 0;
+        successHistory.length = 0;
+
+        selectedCombineA = null;
+        selectedCombineB = null;
+        selectedLoadIndex = null;
+        
+        localStorage.removeItem('cubeGameData'); // 로컬 스토리지 데이터 삭제
+        updateUI(); // UI 업데이트
+    }
+
+    function saveGame() {
+        const gameData = {
+            money, level, immunity, boost, lastUpgradeSuccess, autoImmunity, enableAnimation,
+            has50, hasLuck, hasB30, hasW50, linkCount, hasBoosterQuestion, hasHidden100,
+            storedCubes, connectedCubes, connectedIdCounter, successHistory
+        };
+        localStorage.setItem('cubeGameData', JSON.stringify(gameData));
+    }
+
+    function loadGame() {
+        const savedData = localStorage.getItem('cubeGameData');
+        if (savedData) {
+            const gameData = JSON.parse(savedData);
+            money = gameData.money !== undefined ? gameData.money : 100;
+            level = gameData.level !== undefined ? gameData.level : 0;
+            immunity = gameData.immunity !== undefined ? gameData.immunity : 0;
+            boost = gameData.boost !== undefined ? gameData.boost : 0;
+            lastUpgradeSuccess = gameData.lastUpgradeSuccess !== undefined ? gameData.lastUpgradeSuccess : true;
+            autoImmunity = gameData.autoImmunity !== undefined ? gameData.autoImmunity : false;
+            enableAnimation = gameData.enableAnimation !== undefined ? gameData.enableAnimation : true;
+
+            has50 = gameData.has50 !== undefined ? gameData.has50 : false;
+            hasLuck = gameData.hasLuck !== undefined ? gameData.hasLuck : false;
+            hasB30 = gameData.hasB30 !== undefined ? gameData.hasB30 : false;
+            hasW50 = gameData.hasW50 !== undefined ? gameData.hasW50 : false;
+            linkCount = gameData.linkCount !== undefined ? gameData.linkCount : 0;
+            hasBoosterQuestion = gameData.hasBoosterQuestion !== undefined ? gameData.hasBoosterQuestion : false;
+            hasHidden100 = gameData.hasHidden100 !== undefined ? gameData.hasHidden100 : false;
+
+
+            storedCubes.splice(0, storedCubes.length, ...(gameData.storedCubes || []));
+            connectedCubes.splice(0, connectedCubes.length, ...(gameData.connectedCubes || []));
+            connectedIdCounter = gameData.connectedIdCounter !== undefined ? gameData.connectedIdCounter : 0;
+            successHistory.splice(0, successHistory.length, ...(gameData.successHistory || []));
+        }
+    }
+
+    // Admin Panel functions
+    function toggleAdminPanel() {
+        const adminPanel = document.getElementById('adminPanel');
+        const adminToggleBtn = document.getElementById('adminToggleBtn');
+        if (adminPanel.classList.contains('open')) {
+            adminPanel.classList.remove('open');
+            adminPanel.style.display = 'none';
+            adminToggleBtn.innerText = '🔒 관리자 패널';
+        } else {
+            adminPanel.classList.add('open');
+            adminPanel.style.display = 'block';
+            adminToggleBtn.innerText = '✖ 닫기';
+        }
+    }
+
+    function adminAddMoney() {
+        money += 1000000;
+        showMessage('관리자: 돈 1,000,000원 추가!');
+        updateUI();
+        saveGame();
+    }
+
+    function adminSetLevel() {
+        level = 50;
+        showMessage('관리자: 강화 단계 50으로 설정!');
+        updateUI();
+        saveGame();
+    }
+
+    function adminGetAllItems() {
+        has50 = true;
+        hasLuck = true;
+        hasB30 = true;
+        hasW50 = true;
+        linkCount += 10;
+        hasBoosterQuestion = true;
+        showMessage('관리자: 모든 클리어 아이템을 획득했습니다!');
+        updateUI();
+        saveGame();
+    }
+
+    function adminAddImmunity() {
+        immunity += 10;
+        showMessage('관리자: 면제권 10개 추가!');
+        updateUI();
+        saveGame();
+    }
+
+    function adminAddLink() {
+        linkCount += 5;
+        showMessage('관리자: 연결 고리 5개 추가!');
+        updateUI();
+        saveGame();
+    }
+
+    function adminAddBoosterQuestion() {
+        hasBoosterQuestion = true;
+        showMessage('관리자: 어쩌다 부스터? 획득!');
+        updateUI();
+        saveGame();
+    }
+
+    function adminAddHidden100() {
+        hasHidden100 = true;
+        showMessage('관리자: (히든)100강 큐브 획득!');
+        updateUI();
+        saveGame();
+    }
+
+    // Initialize game on page load
+    window.onload = initGame;
+
+</script>
+</body>
+</html>

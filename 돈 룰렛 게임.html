@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>돈 룰렛 게임</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      padding: 20px;
+      margin: 0;
+      background-color: white; /* 룰렛 게임 배경 흰색 */
+      color: black;            /* 룰렛 게임 폰트 검정색 */
+      user-select: none;
+      overflow-x: hidden;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+
+    #money, #loan, #day {
+      font-size: 24px;
+      margin: 10px;
+      text-shadow: 1px 1px 2px #ccc;
+    }
+
+    #message {
+      font-size: 18px;
+      color: black;
+      text-shadow: 1px 1px 2px #ccc;
+      min-height: 24px;
+      margin-bottom: 10px;
+    }
+
+    #gameOver, #winGame, #finalChoice {
+      display: none;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, 100px);
+      gap: 10px;
+      justify-content: center;
+      margin: 20px auto;
+    }
+
+    .square-btn {
+      width: 100px;
+      height: 100px;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    #winGame {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 42px;
+      color: black;
+      text-shadow: 2px 2px 6px #ccc;
+    }
+
+    /* === 총알 피하기 게임 영역 === */
+    #bulletGame {
+      display: none;
+      position: relative;
+      width: 360px;
+      margin: 0 auto;
+      user-select: none;
+      background-color: black;
+      color: white; /* 총알 피하기 폰트 흰색 */
+    }
+
+    #gameCanvas {
+      background-color: #111;
+      border: 2px solid white;
+      display: block;
+      margin: 20px auto 0 auto;
+      touch-action: none;
+    }
+
+    #countdown {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 72px;
+      color: lime;
+      text-shadow: 2px 2px 6px black;
+      user-select: none;
+      pointer-events: none;
+    }
+
+    #bulletMessage {
+      color: white;
+      text-align: center;
+      margin-top: 10px;
+      font-size: 16px;
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="rouletteGame">
+    <h1 id="title">돈 룰렛 게임 (1단계 - 1000원을 모아라! 100일안에??)</h1>
+    <div id="day">Day: 1</div>
+    <div id="money">현재 돈: 100원</div>
+    <div id="loan">대출금: 0원</div>
+    <button id="rouletteBtn" onclick="spinRoulette()">룰렛 돌리기</button>
+    <button onclick="takeLoan()">100원 대출</button>
+    <button id="clickBtn" onclick="clickToEarn()">누르기 (+1원)</button>
+    <button onclick="secretAddMoney()">비밀 버튼</button>
+    <button id="hardcoreBtn" onclick="activateHardcore()">하드코어</button>
+    <button onclick="lifeReverse()" id="lifeReverseBtn" style="display:none;">인생역전</button>
+    <div id="message">게임을 시작합니다!</div>
+    <div id="gameOver"><h2 id="gameOverMsg">파산! 게임 오버!</h2></div>
+    <div id="winGame"></div>
+    <div id="finalChoice"></div>
+  </div>
+
+  <div id="bulletGame">
+    <canvas id="gameCanvas" width="360" height="600"></canvas>
+    <div id="countdown"></div>
+    <div id="bulletMessage">좌우로 움직이며 총알을 피하세요! (100초 버티면 클리어)</div>
+  </div>
+
+  <script>
+    // 룰렛 게임 관련 변수
+    let money = 100, loan = 0, day = 1, stage = 1, retryCount = 0;
+    let clickCooldown = false, clickPressCount = 0;
+    let isHardcore = false, hardcoreUsed = false, lifeReverseUsed = false, inFinalStage = false;
+    let dayInterval;
+
+    const dayLimit = {1: 100, 2: 30, 3: 10};
+    const goalMoney = {1: 1000, 2: 2000, 3: 30000};
+
+    // --- 룰렛 게임 함수들 ---
+
+    function updateDisplay() {
+      document.getElementById("money").innerText = `현재 돈: ${Math.floor(money)}원`;
+      document.getElementById("loan").innerText = `대출금: ${Math.floor(loan)}원`;
+      document.getElementById("day").innerText = `Day: ${day}`;
+      document.getElementById("clickBtn").innerText = `누르기 (+1원)`;
+      if (stage === 3) {
+        document.getElementById("lifeReverseBtn").style.display = money >= 500 && !lifeReverseUsed ? "inline-block" : "none";
+      } else {
+        document.getElementById("lifeReverseBtn").style.display = "none";
+      }
+    }
+
+    function clickToEarn() {
+      if (money <= -300 || clickCooldown) return;
+      if (stage === 2) {
+        clickPressCount++;
+        if (clickPressCount >= 2) {
+          money += 1;
+          clickPressCount = 0;
+          document.getElementById("message").innerText = "+1원 획득!";
+        } else {
+          document.getElementById("message").innerText = "한 번 더 눌러야 돈이 들어옵니다.";
+        }
+        clickCooldown = true;
+        document.getElementById("clickBtn").disabled = true;
+        setTimeout(() => {
+          clickCooldown = false;
+          document.getElementById("clickBtn").disabled = false;
+        }, 300);
+      } else {
+        money += 1;
+        document.getElementById("message").innerText = "+1원 획득!";
+      }
+      checkLoanRepayment();
+      checkGameStatus();
+      updateDisplay();
+    }
+
+    function spinRoulette() {
+      if (money <= -300) return;
+      const r = Math.random();
+      let result, msg = "룰렛 결과: ";
+      if (r < 0.001) result = -400;
+      else if (r < 0.01) result = "0원";
+      else if (r < 0.02) result = -100;
+      else {
+        const options = [0.1, 0.5, 1, 1.5, 2, "+150"];
+        result = options[Math.floor(Math.random() * options.length)];
+      }
+      if (result === "0원") {
+        money = 0;
+        msg += "0원됨!";
+      } else if (result === -100 || result === -400) {
+        money += result;
+        msg += `${result}원 감소!`;
+      } else if (typeof result === "string") {
+        const plus = parseInt(result.slice(1));
+        money += plus;
+        msg += `+${plus}원 증가!`;
+      } else {
+        const before = money;
+        money *= result;
+        msg += `${result}배 (${Math.floor(money - before)}원 변화!)`;
+      }
+      document.getElementById("message").innerText = msg;
+      checkLoanRepayment();
+      checkGameStatus();
+      updateDisplay();
+    }
+
+    function takeLoan() {
+      if (stage !== 1) return alert("2단계 이상에서는 대출이 불가능합니다");
+      if (loan > 0) return alert("이미 대출했습니다");
+      loan = 100; money += 100;
+      document.getElementById("message").innerText = "100원 대출받았습니다. 하루마다 10% 이자!";
+      updateDisplay();
+    }
+
+    function checkLoanRepayment() {
+      if (loan > 0 && money >= loan) {
+        money -= loan;
+        loan = 0;
+        document.getElementById("message").innerText += " 대출 상환 완료!";
+      }
+    }
+
+    function secretAddMoney() {
+      const pw = prompt("비밀번호 입력:");
+      if (pw === "0822") {
+        money += 500;
+        document.getElementById("message").innerText = "500원 몰래 획득!";
+      } else if (pw === "1203") {
+        money += 2000;
+        document.getElementById("message").innerText = "2000원 몰래 획득!";
+      } else alert("비밀번호가 틀렸습니다");
+      updateDisplay();
+    }
+
+    function lifeReverse() {
+      if (stage !== 3 || lifeReverseUsed || money < 500) return;
+      lifeReverseUsed = true;
+      if (Math.random() < 0.5) {
+        money *= 10;
+        alert("인생역전 성공! 돈 10배!");
+      } else {
+        money = 0;
+        alert("인생역전 실패... 돈 0원...");
+      }
+      updateDisplay();
+      checkGameStatus();
+    }
+
+    function activateHardcore() {
+      if (hardcoreUsed) {
+        document.getElementById("message").innerText = "이미 하드코어입니다.";
+        return;
+      }
+      hardcoreUsed = true; isHardcore = true;
+      document.getElementById("title").innerText += " 하드코어!";
+      resetDayInterval();
+    }
+
+    function resetDayInterval() {
+      clearInterval(dayInterval);
+      const intervalTime = isHardcore ? (stage === 3 ? 2000 : 1000) : 30000;
+      dayInterval = setInterval(() => {
+        day++;
+        if (loan > 0) {
+          loan = Math.ceil(loan * 1.1); // 10% 이자 매일 증가
+        }
+        checkDayLimit();
+        updateDisplay();
+      }, intervalTime);
+    }
+
+    function checkDayLimit() {
+      if ((stage === 1 && day > dayLimit[1]) ||
+          (stage === 2 && day > dayLimit[2]) ||
+          (stage === 3 && day > dayLimit[3])) {
+        endGame("시간 초과! 게임 오버!");
+      }
+    }
+
+    function endGame(msg) {
+      document.getElementById("gameOverMsg").innerText = msg;
+      document.getElementById("gameOver").style.display = "block";
+      disableGame();
+    }
+
+    function disableGame() {
+      document.querySelectorAll("button").forEach(b => b.disabled = true);
+    }
+
+    function checkGameStatus() {
+      if (money <= -300) return endGame("파산! 게임 오버!");
+      if (loan > 0 && loan > goalMoney[stage]) return endGame("빚쟁이!");
+      if (stage === 1 && money >= goalMoney[1]) return showStage1Choice();
+      if (stage === 2 && money >= goalMoney[2] && !inFinalStage) return showFinalChoice();
+      if (stage === 3 && money >= goalMoney[3]) return clearGame();
+    }
+
+    function showStage1Choice() {
+      stage = -1;
+      const htmlBackup = document.documentElement.innerHTML;
+      document.body.innerHTML = `<h2>성공 버튼을 찾아보세요!</h2><div class="grid" id="choiceGrid"></div><div id="result"></div>`;
+      const grid = document.getElementById("choiceGrid");
+      let btnCount = Math.max(1, 9 - retryCount);
+      let correct = Math.floor(Math.random() * btnCount);
+      for (let i = 0; i < btnCount; i++) {
+        const btn = document.createElement("button");
+        btn.className = "square-btn"; btn.innerText = i + 1;
+        btn.onclick = () => {
+          if (i === correct) {
+            stage = 2; money = 0; day = 1; inFinalStage = false; retryCount = 0;
+            document.documentElement.innerHTML = htmlBackup;
+            document.getElementById("title").innerText = `돈 룰렛 게임 (2단계 - 2000원을 모아라! 30일안에??)${isHardcore ? " 하드코어!" : ""}`;
+            resetDayInterval(); updateDisplay();
+          } else {
+            retryCount++;
+            document.getElementById("result").innerText = "실패! 다시 시도하세요.";
+          }
+        };
+        grid.appendChild(btn);
+      }
+    }
+
+    function showFinalChoice() {
+      inFinalStage = true;
+      const htmlBackup = document.documentElement.innerHTML;
+      document.body.innerHTML = `<h2>최종 선택! 하나를 고르세요</h2><div class="grid" id="finalGrid"></div>`;
+      const grid = document.getElementById("finalGrid");
+      const correct = Math.floor(Math.random() * 2);
+      for (let i = 0; i < 2; i++) {
+        const btn = document.createElement("button");
+        btn.className = "square-btn";
+        btn.innerText = i === 0 ? "선택 A" : "선택 B";
+        btn.onclick = () => {
+          if (i === correct) {
+            stage = 3; money = 0; day = 1;
+            document.documentElement.innerHTML = htmlBackup;
+            document.getElementById("title").innerText = `돈 룰렛 게임 (3단계 - 30000원을 모아라! 10일안에??)${isHardcore ? " 하드코어!" : ""}`;
+            resetDayInterval(); updateDisplay();
+          } else {
+            return endGame("게임 오버!");
+          }
+        };
+        grid.appendChild(btn);
+      }
+    }
+
+    // 여기서부터 총알 피하기 게임 시작 함수로 전환
+
+    function clearGame() {
+      // 3단계 클리어 시 총알 게임 시작
+      document.getElementById("rouletteGame").style.display = "none";
+      document.getElementById("bulletGame").style.display = "block";
+      startBulletGame();
+    }
+
+    // --- 총알 피하기 게임 코드 ---
+
+    function startBulletGame() {
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+      const countdownEl = document.getElementById('countdown');
+      const bulletMessage = document.getElementById('bulletMessage');
+
+      let countdown = 3;
+      countdownEl.innerText = countdown;
+      bulletMessage.style.display = "none";
+
+      // 플레이어 및 총알 변수 초기화
+      const player = {
+        x: canvas.width / 2 - 15,
+        y: canvas.height - 60,
+        width: 30,
+        height: 30,
+        speed: 4,
+        color: 'lime'
+      };
+      const bullets = [];
+      let keys = {};
+      let touchDirection = { left: false, right: false };
+      let gameOver = false;
+      let gameClear = false;
+      let startTime = null;
+      let lastBulletTime = 0;
+
+      // 키보드 이벤트
+      function keyDownHandler(e) { keys[e.key] = true; }
+      function keyUpHandler(e) { keys[e.key] = false; }
+
+      document.addEventListener('keydown', keyDownHandler);
+      document.addEventListener('keyup', keyUpHandler);
+
+      // 터치 이벤트
+      canvas.addEventListener('touchstart', handleTouch);
+      canvas.addEventListener('touchmove', handleTouch);
+      canvas.addEventListener('touchend', () => { touchDirection = { left: false, right: false }; });
+
+      function handleTouch(e) {
+        const touch = e.touches[0];
+        const rect = canvas.getBoundingClientRect();
+        const x = touch.clientX - rect.left;
+        touchDirection.left = x < canvas.width / 2;
+        touchDirection.right = x > canvas.width / 2;
+      }
+
+      // 플레이어 업데이트 함수
+      function updatePlayer() {
+        if (keys['ArrowLeft'] || touchDirection.left) player.x -= player.speed;
+        if (keys['ArrowRight'] || touchDirection.right) player.x += player.speed;
+        player.x = Math.max(0, Math.min(canvas.width - player.width, player.x));
+      }
+
+      // 그리기 함수들
+      function drawPlayer() {
+        ctx.fillStyle = player.color;
+        ctx.fillRect(player.x, player.y, player.width, player.height);
+      }
+      function drawBullets() {
+        ctx.fillStyle = 'red';
+        bullets.forEach(b => ctx.fillRect(b.x, b.y, b.size, b.size));
+      }
+      function drawTime(elapsed) {
+        ctx.fillStyle = 'white';
+        ctx.font = '16px Arial';
+        ctx.fillText(`생존 시간: ${elapsed.toFixed(1)}초`, 10, 20);
+      }
+
+      // 총알 생성
+      function spawnBullet(elapsed) {
+        const size = 10;
+        const x = Math.random() * (canvas.width - size);
+        let speed = 2 + Math.random() * 2;
+        if (elapsed >= 60) speed += 2;
+        bullets.push({ x, y: -size, size, speed });
+      }
+
+      // 총알 및 충돌 업데이트
+      function updateBullets() {
+        for (let i = bullets.length - 1; i >= 0; i--) {
+          const b = bullets[i];
+          b.y += b.speed;
+
+          if (
+            b.x < player.x + player.width &&
+            b.x + b.size > player.x &&
+            b.y < player.y + player.height &&
+            b.y + b.size > player.y
+          ) {
+            gameOver = true;
+          }
+
+          if (b.y > canvas.height) bullets.splice(i, 1);
+        }
+      }
+
+      // 게임 루프
+      function gameLoop(currentTime) {
+        if (!startTime) startTime = currentTime;
+        const elapsed = (currentTime - startTime) / 1000;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        if (gameOver) {
+          ctx.fillStyle = "rgba(0,0,0,0.7)";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = "red";
+          ctx.font = "32px Arial";
+          ctx.fillText("게임 오버!", canvas.width / 2 - 80, canvas.height / 2 - 20);
+          ctx.fillStyle = "white";
+          ctx.fillText(`생존: ${elapsed.toFixed(1)}초`, canvas.width / 2 - 60, canvas.height / 2 + 30);
+          return;
+        }
+
+        if (gameClear) {
+          ctx.fillStyle = "black";
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.fillStyle = "lime";
+          ctx.font = "30px Arial";
+          ctx.fillText("🎉 클리어 성공! 🎉", canvas.width / 2 - 110, canvas.height / 2);
+          return;
+        }
+
+        if (elapsed >= 100) {
+          gameClear = true;
+        }
+
+        updatePlayer();
+        updateBullets();
+        drawPlayer();
+        drawBullets();
+        drawTime(elapsed);
+
+        if (currentTime - lastBulletTime > 500) {
+          spawnBullet(elapsed);
+          lastBulletTime = currentTime;
+        }
+
+        requestAnimationFrame(gameLoop);
+      }
+
+      // 카운트다운 후 게임 시작
+      function countdownTick() {
+        if (countdown === 0) {
+          countdownEl.style.display = "none";
+          bulletMessage.style.display = "block";
+          requestAnimationFrame(gameLoop);
+          return;
+        }
+        countdownEl.innerText = countdown;
+        countdown--;
+        setTimeout(countdownTick, 1000);
+      }
+
+      bulletMessage.style.display = "none";
+      countdownEl.style.display = "block";
+      countdownTick();
+    }
+
+    // 초기 세팅
+    resetDayInterval();
+    updateDisplay();
+
+  </script>
+
+</body>
+</html>
