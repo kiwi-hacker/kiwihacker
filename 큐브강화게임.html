@@ -925,6 +925,10 @@
             return;
         }
 
+        if (level >= MAX_LEVEL) {
+            showMessage('강화는 50강이 최대입니다!');
+            return;
+        }
         money -= 1000;
         let upgradeResult = false;
 
@@ -956,23 +960,20 @@
                 showMessage('아이템 "이상한 50강"을 획득했습니다!');
             }
             
-        } else {
-            upgradeResult = false;
-            lastUpgradeSuccess = false;
-            if (autoImmunity && immunity > 0) {
-                immunity--;
-                showMessage('강화 실패했지만 면제권 자동 사용으로 단계 유지!');
-            } else if (immunity > 0 && !autoImmunity) {
-                // 면제권 수동 사용 시 강화 실패해도 단계 유지
-                showMessage('강화 실패! 면제권을 사용하려면 버튼을 누르세요!');
             } else {
-                level = Math.max(0, level - 1);
-                showMessage(`강화 실패! 현재 ${level}강!`);
+                    upgradeResult = false;
+                    lastUpgradeSuccess = false;
+                    if (autoImmunity && immunity > 0) {
+                        immunity--;
+                        showMessage('강화 실패했지만 면제권 자동 사용으로 단계 유지!');
+                    } else {
+                        level = Math.max(0, level - 1);
+                        showMessage(`강화 실패! 현재 ${level}강!`);
+                    }
+                    if (enableAnimation) {
+                        animateCubeColor('fail');
+                    }
             }
-            if (enableAnimation) {
-                animateCubeColor('fail');
-            }
-        }
 
         // 연결 고리 획득 로직
         successHistory.push(upgradeResult);

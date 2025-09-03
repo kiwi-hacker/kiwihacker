@@ -102,9 +102,11 @@
         }
         
         .item-grade-general {}
-        .item-grade-gold { text-shadow: 0 0 5px #ffd700; }
-        .item-grade-diamond { text-shadow: 0 0 5px #00ffff; }
-        .item-grade-rainbow { text-shadow: 0 0 5px #ff00ff; }
+        .item-grade-gold { text-shadow: 0 0 5px #ffd700, 0 0 10px #ffd700; color: #fef08a; }
+        .item-grade-diamond { text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff; color: #7dd3fc; }
+        .item-grade-rainbow {
+            animation: rainbow-text 2s linear infinite;
+        }
 
         .rarity-general { color: #9ca3af; }
         .rarity-rare { color: #16a34a; }
@@ -134,9 +136,14 @@
         }
 
         @keyframes rainbow-text {
-            0% { color: #ff0000; } 14% { color: #ff7f00; } 28% { color: #ffff00; }
-            42% { color: #00ff00; } 57% { color: #0000ff; } 71% { color: #4b0082; }
-            85% { color: #9400d3; } 100% { color: #ff0000; }
+            0% { color: #ff0000; text-shadow: 0 0 5px #ff0000; } 
+            14% { color: #ff7f00; text-shadow: 0 0 5px #ff7f00; } 
+            28% { color: #ffff00; text-shadow: 0 0 5px #ffff00; }
+            42% { color: #00ff00; text-shadow: 0 0 5px #00ff00; } 
+            57% { color: #0000ff; text-shadow: 0 0 5px #0000ff; } 
+            71% { color: #4b0082; text-shadow: 0 0 5px #4b0082; }
+            85% { color: #9400d3; text-shadow: 0 0 5px #9400d3; } 
+            100% { color: #ff0000; text-shadow: 0 0 5px #ff0000; }
         }
         @keyframes transcendent-shine {
             0% { background-position: -200%; }
@@ -146,17 +153,7 @@
             0% { background-position: -200% center; }
             100% { background-position: 200% center; }
         }
-        @keyframes shake {
-            10%, 90% { transform: translate3d(-1px, 0, 0); }
-            20%, 80% { transform: translate3d(2px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-            40%, 60% { transform: translate3d(4px, 0, 0); }
-        }
-        @keyframes particle-og-fly {
-            from { transform: scale(1.2); }
-            to { transform: scale(0) translate(var(--x), var(--y)); }
-        }
-
+       
         .item-card {
             background-color: #1f2937;
             border-radius: 0.5rem;
@@ -228,6 +225,7 @@
         
         .interactable-button:disabled {
             background: #374151;
+            color: #6b7280;
             cursor: not-allowed;
             transform: translateY(0);
             box-shadow: 0 2px #111;
@@ -361,10 +359,11 @@
             animation: particle-fade-out 1.5s forwards;
         }
         
-        .particle-gold { background-color: #ffd700; }
-        .particle-diamond { background-color: #00ffff; }
+        .particle-gold { background-color: #ffd700; box-shadow: 0 0 5px #ffd700; }
+        .particle-diamond { background-color: #00ffff; box-shadow: 0 0 5px #00ffff; }
         .particle-rainbow {
             background: linear-gradient(45deg, #f97316, #facc15, #8b5cf6, #3b82f6, #60a5fa);
+            box-shadow: 0 0 5px #ff00ff;
         }
         
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
@@ -379,7 +378,7 @@
             left: 1rem;
             width: 3rem;
             height: 3rem;
-            background: transparent;
+            background-color: transparent;
             border: none;
             cursor: pointer;
             z-index: 999;
@@ -479,7 +478,7 @@
         @keyframes sparkle-fly-out {
             from { transform: translate(0, 0) scale(1.5); opacity: 1; }
             to { 
-                transform: translate(var(--x), var(--y)) scale(0);
+                transform: translate(var(--x), var(--y)) scale(0); 
                 opacity: 0;
             }
         }
@@ -581,7 +580,7 @@
         .kiwi-hunt-emoji {
             cursor: pointer;
             transition: transform 0.2s;
-            display: inline-block; /* ensures it can be transformed */
+            display: inline-block;
         }
         .kiwi-hunt-emoji:hover {
             transform: scale(1.5) rotate(15deg);
@@ -593,17 +592,8 @@
         <span class="text-xl">🍀</span>
         <span id="luck-buff-timer"></span>
     </div>
-    <div id="confirm-modal" class="fixed inset-0 bg-gray-900 bg-opacity-75 z-50 hidden items-center justify-center p-4">
-        <div class="bg-gray-800 rounded-lg p-6 w-full max-w-sm">
-            <h3 id="confirm-modal-title" class="text-xl font-bold text-white mb-2"></h3>
-            <p id="confirm-modal-text" class="text-gray-300 mb-4"></p>
-            <div class="flex justify-end gap-2">
-                <button id="confirm-modal-no" class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition">취소</button>
-                <button id="confirm-modal-yes" class="px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 transition">확인</button>
-            </div>
-        </div>
-    </div>
-    <button id="secret-code-button" class="floating-btn">🔑</button>
+
+    <button id="secret-code-button" class="floating-btn"></button>
     <button id="admin-panel-button" class="admin-panel-btn interactable-button hidden">관리자 패널</button>
     
     <div id="gacha-screen" class="container space-y-8">
@@ -645,13 +635,11 @@
             
             <div id="content-inventory" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
             <div id="content-pokedex" class="hidden">
-                <div class="flex flex-wrap justify-center space-x-2 md:space-x-4 mb-4 border-b border-gray-700 pb-2">
+                 <div class="flex flex-wrap justify-center space-x-2 md:space-x-4 mb-4 border-b border-gray-700 pb-2">
                     <button class="tab-button pokedex-grade-tab active" data-grade="general">일반</button>
                     <button class="tab-button pokedex-grade-tab" data-grade="gold">골드</button>
                     <button class="tab-button pokedex-grade-tab" data-grade="diamond">다이아</button>
                     <button class="tab-button pokedex-grade-tab" data-grade="rainbow">무지개</button>
-                    <button class="tab-button pokedex-grade-tab hidden" data-grade="secret">시크릿</button>
-                    <button class="tab-button pokedex-grade-tab hidden" data-grade="og">OG</button>
                 </div>
                 <div id="pokedex-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4"></div>
             </div>
@@ -672,13 +660,13 @@
                     </div>
                 </div>
                 <div id="shop-content-sell" class="hidden">
-                    <h3 class="text-xl font-bold text-center mb-4">보유 수집품 판매 <span class="hidden kiwi-hunt-emoji" data-hunt-id="4">🥝</span></h3>
+                    <h3 class="text-xl font-bold text-center mb-4">보유 수집품 판매 <span class="hidden kiwi-hunt-emoji" data-hunt-location="shop">🥝</span></h3>
                     <div id="sell-inventory-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 max-h-96 overflow-y-auto p-2"></div>
                 </div>
             </div>
 
             <div id="content-money-making" class="hidden bg-gray-800 p-6 rounded-lg">
-                <div class="text-center mb-4">
+                 <div class="text-center mb-4">
                     <h3 class="text-xl font-bold">수집품으로 돈 벌기</h3>
                     <p class="text-sm text-gray-400">수집품을 배치하여 자동으로 코인을 획득하세요. (최대 10개)</p>
                     <div class="bg-gray-900 p-3 rounded-lg mt-2">
@@ -694,7 +682,7 @@
                 <div class="flex justify-center border-b border-gray-700 mb-4">
                     <button class="sub-tab-button active" data-subtab="settings-main">설정</button>
                     <button class="sub-tab-button" data-subtab="settings-messages">메시지함 <span id="message-subtab-dot" class="notification-dot"></span></button>
-                    <button class="sub-tab-button" data-subtab="settings-missions">일일 미션</button>
+                    <button class="sub-tab-button" data-subtab="settings-missions">미션</button>
                 </div>
                 <div id="subtab-content-settings-main">
                     <h3 class="text-xl font-bold text-center mb-4">게임 설정</h3>
@@ -703,12 +691,12 @@
                         <div class="setting-item"><span>효과음</span><button id="setting-toggle-sound" class="interactable-button"></button></div>
                         <div class="setting-item"><span>알림 표시</span><button id="setting-toggle-notification" class="interactable-button"></button></div>
                     </div>
-                    <div class="text-center mt-6"><span class="hidden kiwi-hunt-emoji" data-hunt-id="1">🥝</span></div>
+                    <div class="text-center mt-6"><span class="hidden kiwi-hunt-emoji" data-hunt-location="settings">🥝</span></div>
                 </div>
                 <div id="subtab-content-settings-messages" class="hidden">
                     <div class="flex justify-between items-center mb-4">
-                        <h3 class="text-xl font-bold text-center">메시지함</h3>
-                        <button id="mark-all-read-btn" class="interactable-button text-xs py-1 px-2">모두 읽기</button>
+                         <h3 class="text-xl font-bold text-center">메시지함</h3>
+                         <button id="mark-all-read-btn" class="interactable-button text-xs py-1 px-2">모두 읽기</button>
                     </div>
                     <div id="message-list" class="max-h-96 overflow-y-auto bg-gray-900 rounded-lg"></div>
                 </div>
@@ -717,7 +705,7 @@
                         <button class="sub-tab-button mission-tab active" data-mission-tab="active">진행중인 미션</button>
                         <button class="sub-tab-button mission-tab" data-mission-tab="completed">완료한 미션</button>
                     </div>
-                    <div id="mission-content-active"></div>
+                    <div id="mission-content-active" class="max-h-96 overflow-y-auto"></div>
                     <div id="mission-content-completed" class="hidden max-h-96 overflow-y-auto"></div>
                 </div>
             </div>
@@ -726,15 +714,16 @@
         <div class="my-8">
             <h2 class="text-2xl font-bold text-white text-center mb-4">아이템 강화</h2>
             <div class="bg-gray-800 p-6 rounded-lg shadow-inner flex flex-col items-center">
-                <p class="text-sm text-center mb-4">같은 아이템 3개를 소모하여 레벨업할 수 있습니다 (최대 Lv.3).</p>
+                <p class="text-sm text-center mb-4">같은 등급, 같은 레벨의 아이템 3개를 소모하여 레벨업할 수 있습니다 (최대 Lv.3).</p>
                 <button id="combine-button" class="interactable-button bg-orange-600 border-orange-700 hover:bg-orange-700 hover:border-orange-800 active:bg-orange-800" disabled>강화하기 (3개 소모)</button>
             </div>
         </div>
+        
         <div class="text-center mt-8">
             <button id="combo-minigame-start-button" class="interactable-button bg-teal-600 border-teal-700 hover:bg-teal-700">연타 미니게임</button>
         </div>
     </div>
-    
+
     <div id="pokedex-info-modal" class="modal">
         <div class="modal-content text-left">
             <span id="close-pokedex-modal" class="close-button">&times;</span>
@@ -748,11 +737,11 @@
             <div class="bg-gray-700 p-4 rounded-lg">
                 <p class="text-xs mb-2 text-gray-400">아이템 설명:</p>
                 <p id="pokedex-item-description" class="text-sm"></p>
-                <p class="text-xs mt-3 mb-1 text-gray-400">돈 벌기 정보:</p>
+                <p class="text-xs mt-3 mb-1 text-gray-400">돈 벌기 정보 (Lv.1 기준):</p>
                 <p class="text-sm">초당 수익: <strong id="pokedex-item-eps" class="text-green-400"></strong></p>
-                <div class="text-center mt-2">
-                    <span class="hidden kiwi-hunt-emoji" data-hunt-id="2">🥝</span>
-                    <span class="hidden kiwi-hunt-emoji" data-hunt-id="3">🥝</span>
+                 <div class="text-center mt-2">
+                    <span class="hidden kiwi-hunt-emoji" data-hunt-location="pokedex-secret">🥝</span>
+                    <span class="hidden kiwi-hunt-emoji" data-hunt-location="pokedex-cup">🥝</span>
                 </div>
             </div>
         </div>
@@ -761,9 +750,8 @@
     <div id="item-selection-modal" class="modal">
         <div class="modal-content">
             <span id="close-item-selection-modal" class="close-button">&times;</span>
-            <h3 class="text-2xl font-bold mb-4">배치할 수집품 선택</h3>
-            <div class="text-center mb-2"><span class="hidden kiwi-hunt-emoji" data-hunt-id="5">🥝</span></div>
-            <div id="item-selection-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4"></div>
+            <h3 class="text-2xl font-bold mb-4">배치할 수집품 선택 <span class="hidden kiwi-hunt-emoji" data-hunt-location="money-making">🥝</span></h3>
+            <div id="item-selection-grid" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 max-h-96 overflow-y-auto"></div>
         </div>
     </div>
     
@@ -786,7 +774,7 @@
             <p id="combo-result" class="mt-4 text-lg font-bold"></p>
         </div>
     </div>
-    
+
     <div id="code-input-modal" class="modal">
         <div class="modal-content">
             <span id="close-code-modal" class="close-button">&times;</span>
@@ -796,7 +784,7 @@
             <p id="code-message" class="mt-2 text-sm"></p>
         </div>
     </div>
-    
+
     <div id="confirm-modal" class="modal">
         <div class="modal-content" style="max-width: 400px;">
             <h3 class="text-xl font-bold mb-4" id="confirm-modal-title"></h3>
@@ -815,6 +803,8 @@
             <div class="space-y-4">
                 <button id="get-all-items-btn" class="interactable-button w-full bg-red-600">모든 아이템 얻기</button>
                 <button id="get-100m-coins-btn" class="interactable-button w-full bg-green-600">코인 1억개 얻기</button>
+                <button id="complete-all-missions-btn" class="interactable-button w-full bg-blue-600">모든 미션 클리어</button>
+                <button id="get-clear-keys-btn" class="interactable-button w-full bg-yellow-600">모든 열쇠 조각 얻기</button>
                 <button id="reset-game-btn" class="interactable-button w-full bg-gray-600">게임 진행 상황 초기화</button>
             </div>
         </div>
@@ -831,7 +821,7 @@
             </div>
             <p>제작: kiwihacker</p>
             <p class="text-xs mt-2">Special Thanks: 양두영</p>
-            <button id="restart-game-btn" class="interactable-button mt-8 bg-blue-600">새로운 시작</button>
+            <!-- 클리어 후 새로운 시작 버튼 제거 -->
         </div>
     </div>
     
@@ -843,9 +833,9 @@
             <p id="cutscene-rarity" class="cutscene-rarity"></p>
         </div>
     </div>
-    
+
     <script>
-        // --- 1. DOM 요소 선언 ---
+        // --- 1. DOM 요소 선언 (기존과 동일) ---
         const coinsElement = document.getElementById('coin-count');
         const pullButton = document.getElementById('pull-button');
         const pull10Button = document.getElementById('pull-10-button');
@@ -854,23 +844,15 @@
         const resultText = document.getElementById('result-text');
         const particleContainer = document.getElementById('particle-container');
         const contentInventory = document.getElementById('content-inventory');
-        const pokedexGrid = document.getElementById('pokedex-grid');
-        const contentPokedex = document.getElementById('content-pokedex');
-        const pokedexGradeTabs = document.querySelectorAll('.pokedex-grade-tab');
-        const pokedexInfoModal = document.getElementById('pokedex-info-modal');
-        const closePokedexModal = document.getElementById('close-pokedex-modal');
-        const pokedexItemName = document.getElementById('pokedex-item-name');
-        const pokedexItemCount = document.getElementById('pokedex-item-count');
-        const pokedexItemLevel = document.getElementById('pokedex-item-level');
         const pokedexItemRarity = document.getElementById('pokedex-item-rarity');
         const pokedexItemChance = document.getElementById('pokedex-item-chance');
         const pokedexItemDescription = document.getElementById('pokedex-item-description');
-        const pokedexItemEps = document.getElementById('pokedex-item-eps');
         const tabInventoryBtn = document.getElementById('tab-inventory');
         const tabPokedexBtn = document.getElementById('tab-pokedex');
         const tabShopBtn = document.getElementById('tab-shop');
         const tabMoneyMakingBtn = document.getElementById('tab-money-making');
         const tabSettingsBtn = document.getElementById('tab-settings');
+        const contentPokedex = document.getElementById('content-pokedex');
         const contentShop = document.getElementById('content-shop');
         const contentMoneyMaking = document.getElementById('content-money-making');
         const contentSettings = document.getElementById('content-settings');
@@ -880,1322 +862,1456 @@
         const shopContentSell = document.getElementById('shop-content-sell');
         const buyLuckBuffBtn = document.getElementById('buy-luck-buff-btn');
         const sellInventoryGrid = document.getElementById('sell-inventory-grid');
+        const luckBuffDisplay = document.getElementById('luck-buff-display');
+        const luckBuffTimer = document.getElementById('luck-buff-timer');
+        const moneyMakingSlotsContainer = document.getElementById('money-making-slots');
         const uncollectedCoinsEl = document.getElementById('uncollected-coins');
         const totalEpsEl = document.getElementById('total-eps');
         const collectAllBtn = document.getElementById('collect-all-btn');
-        const moneyMakingSlots = document.getElementById('money-making-slots');
         const itemSelectionModal = document.getElementById('item-selection-modal');
         const closeItemSelectionModal = document.getElementById('close-item-selection-modal');
         const itemSelectionGrid = document.getElementById('item-selection-grid');
-        const combineButton = document.getElementById('combine-button');
-        const missionActiveContent = document.getElementById('mission-content-active');
-        const missionCompletedContent = document.getElementById('mission-content-completed');
-        const missionTabs = document.querySelectorAll('.mission-tab');
-        const messageList = document.getElementById('message-list');
-        const messageDetailModal = document.getElementById('message-detail-modal');
-        const messageDetailTitle = document.getElementById('message-detail-title');
-        const messageDetailContent = document.getElementById('message-detail-content');
-        const messageDetailRewardSection = document.getElementById('message-detail-reward-section');
-        const closeMessageDetailModal = document.getElementById('close-message-detail-modal');
-        const markAllReadBtn = document.getElementById('mark-all-read-btn');
-        const messageNotificationDot = document.getElementById('message-notification-dot');
-        const messageSubtabDot = document.getElementById('message-subtab-dot');
+        const pokedexItemEps = document.getElementById('pokedex-item-eps');
         const getCoinsButton = document.getElementById('get-coins-button');
+        const comboMinigameStartButton = document.getElementById('combo-minigame-start-button');
+        const combineButton = document.getElementById('combine-button');
+        const pokedexInfoModal = document.getElementById('pokedex-info-modal');
+        const closePokedexModal = document.getElementById('close-pokedex-modal');
+        const pokedexItemName = document.getElementById('pokedex-item-name');
+        const pokedexItemCount = document.getElementById('pokedex-item-count');
+        const pokedexItemLevel = document.getElementById('pokedex-item-level');
+        const pokedexGrid = document.getElementById('pokedex-grid');
+        const comboMinigameModal = document.getElementById('combo-minigame-modal');
+        const closeComboModal = document.getElementById('close-combo-modal');
+        const comboTimerElement = document.getElementById('combo-timer');
+        const comboClicksElement = document.getElementById('combo-clicks');
+        const comboClickButton = document.getElementById('combo-click-button');
+        const comboResultElement = document.getElementById('combo-result');
+        const secretCodeButton = document.getElementById('secret-code-button');
+        const codeInputModal = document.getElementById('code-input-modal');
+        const secretCodeInput = document.getElementById('secret-code-input');
+        const submitCodeButton = document.getElementById('submit-code-button');
+        const codeMessage = document.getElementById('code-message');
+        const closeCodeModal = document.getElementById('close-code-modal');
+        const adminPanelButton = document.getElementById('admin-panel-button');
+        const adminPanelModal = document.getElementById('admin-panel-modal');
+        const closeAdminPanelModal = document.getElementById('close-admin-panel-modal');
+        const getAllItemsBtn = document.getElementById('get-all-items-btn');
+        const get100mCoinsBtn = document.getElementById('get-100m-coins-btn');
+        const resetGameBtn = document.getElementById('reset-game-btn');
+        const completeAllMissionsBtn = document.getElementById('complete-all-missions-btn');
+        const getClearKeysBtn = document.getElementById('get-clear-keys-btn');
         const confirmModal = document.getElementById('confirm-modal');
         const confirmModalTitle = document.getElementById('confirm-modal-title');
         const confirmModalText = document.getElementById('confirm-modal-text');
         const confirmModalYes = document.getElementById('confirm-modal-yes');
         const confirmModalNo = document.getElementById('confirm-modal-no');
-        const comboMinigameStartButton = document.getElementById('combo-minigame-start-button');
-        const comboMinigameModal = document.getElementById('combo-minigame-modal');
-        const comboClickButton = document.getElementById('combo-click-button');
-        const comboTimerEl = document.getElementById('combo-timer');
-        const comboClicksEl = document.getElementById('combo-clicks');
-        const comboResultEl = document.getElementById('combo-result');
-        const closeComboModal = document.getElementById('close-combo-modal');
-        const secretCodeButton = document.getElementById('secret-code-button');
-        const codeInputModal = document.getElementById('code-input-modal');
-        const closeCodeModal = document.getElementById('close-code-modal');
-        const secretCodeInput = document.getElementById('secret-code-input');
-        const submitCodeButton = document.getElementById('submit-code-button');
-        const codeMessageEl = document.getElementById('code-message');
-        const adminPanelButton = document.getElementById('admin-panel-button');
-        const adminPanelModal = document.getElementById('admin-panel-modal');
-        const closeAdminPanelModal = document.getElementById('close-admin-panel-modal');
-        const getAllItemsBtn = document.getElementById('get-all-items-btn');
-        const get100MCoinsBtn = document.getElementById('get-100m-coins-btn');
-        const resetGameBtn = document.getElementById('reset-game-btn');
-        const clearModal = document.getElementById('clear-modal');
-        const restartGameBtn = document.getElementById('restart-game-btn');
-        const luckBuffDisplay = document.getElementById('luck-buff-display');
-        const luckBuffTimer = document.getElementById('luck-buff-timer');
-        const settingToggleCutsceneBtn = document.getElementById('setting-toggle-cutscene');
-        const settingToggleSoundBtn = document.getElementById('setting-toggle-sound');
-        const settingToggleNotificationBtn = document.getElementById('setting-toggle-notification');
         const cutsceneOverlay = document.getElementById('cutscene-overlay');
         const cutsceneEmoji = document.getElementById('cutscene-emoji');
         const cutsceneName = document.getElementById('cutscene-name');
         const cutsceneRarity = document.getElementById('cutscene-rarity');
         const cutsceneParticles = document.getElementById('cutscene-particles');
-        const kiwiHuntEmojis = document.querySelectorAll('.kiwi-hunt-emoji');
+        const messageNotificationDot = document.getElementById('message-notification-dot');
+        const messageSubtabDot = document.getElementById('message-subtab-dot');
+        const messageDetailModal = document.getElementById('message-detail-modal');
+        const closeMessageDetailModal = document.getElementById('close-message-detail-modal');
+        const messageDetailTitle = document.getElementById('message-detail-title');
+        const messageDetailContent = document.getElementById('message-detail-content');
+        const messageDetailRewardSection = document.getElementById('message-detail-reward-section');
+        const markAllReadBtn = document.getElementById('mark-all-read-btn');
+        const messageList = document.getElementById('message-list');
+        const missionContentActive = document.getElementById('mission-content-active');
+        const missionContentCompleted = document.getElementById('mission-content-completed');
+        const pokedexGradeTabs = document.querySelectorAll('.pokedex-grade-tab');
+        const missionTabs = document.querySelectorAll('.mission-tab');
+        const subTabs = document.querySelectorAll('.sub-tab-button');
+        const subtabContents = {
+            'settings-main': document.getElementById('subtab-content-settings-main'),
+            'settings-messages': document.getElementById('subtab-content-settings-messages'),
+            'settings-missions': document.getElementById('subtab-content-settings-missions')
+        };
+        const settingToggleCutscene = document.getElementById('setting-toggle-cutscene');
+        const settingToggleSound = document.getElementById('setting-toggle-sound');
+        const settingToggleNotification = document.getElementById('setting-toggle-notification');
 
-        // --- 2. 게임 상태 관리 ---
-        const itemData = {
-            'eggplant': { name: '🍆 가지', emoji: '🍆', rarity: 'general', rarityValue: 1, basePrice: 5, grade: '일반' },
-            'broccoli': { name: '🥦 브로콜리', emoji: '🥦', rarity: 'general', rarityValue: 1, basePrice: 6, grade: '일반' },
-            'hotdog': { name: '🌭 핫도그', emoji: '🌭', rarity: 'general', rarityValue: 1, basePrice: 7, grade: '일반' },
-            'pizza': { name: '🍕 피자', emoji: '🍕', rarity: 'general', rarityValue: 1, basePrice: 8, grade: '일반' },
-            'burger': { name: '🍔 햄버거', emoji: '🍔', rarity: 'general', rarityValue: 1, basePrice: 9, grade: '일반' },
-            'strawberry': { name: '🍓 딸기', emoji: '🍓', rarity: 'lesser-rare', rarityValue: 1.5, basePrice: 15, grade: '일반' },
-            'pineapple': { name: '🍍 파인애플', emoji: '🍍', rarity: 'lesser-rare', rarityValue: 1.6, basePrice: 17, grade: '일반' },
-            'taco': { name: '🌮 타코', emoji: '🌮', rarity: 'lesser-rare', rarityValue: 1.7, basePrice: 19, grade: '일반' },
-            'donut': { name: '🍩 도넛', emoji: '🍩', rarity: 'lesser-rare', rarityValue: 1.8, basePrice: 21, grade: '일반' },
-            'gem': { name: '💎 보석', emoji: '💎', rarity: 'rare', rarityValue: 2.5, basePrice: 30, grade: '일반' },
-            'coin': { name: '🪙 코인', emoji: '🪙', rarity: 'rare', rarityValue: 2.7, basePrice: 35, grade: '일반' },
-            'crown': { name: '👑 왕관', emoji: '👑', rarity: 'rare', rarityValue: 3.0, basePrice: 40, grade: '일반' },
-            'trophy': { name: '🏆 트로피', emoji: '🏆', rarity: 'rare', rarityValue: 3.2, basePrice: 45, grade: '일반' },
-            'gold_bar': { name: '💰 골드바', emoji: '💰', rarity: 'legendary', rarityValue: 5, basePrice: 100, grade: '골드' },
-            'diamond': { name: '💠 다이아몬드', emoji: '💠', rarity: 'mystic', rarityValue: 10, basePrice: 500, grade: '다이아' },
-            'rainbow_star': { name: '🌈 무지개별', emoji: '🌈', rarity: 'transcendent', rarityValue: 50, basePrice: 1000, grade: '무지개' },
-            'god_hand': { name: '🙏 신의 손', emoji: '🙏', rarity: 'god', rarityValue: 100, basePrice: 5000, grade: '무지개' },
-            'secret_key': { name: '🗝️ 비밀의 열쇠', emoji: '🗝️', rarity: 'secret', rarityValue: 200, basePrice: 10000, grade: '시크릿' },
-            'og_item': { name: '🔥 OG 아이템', emoji: '🔥', rarity: 'og', rarityValue: 1000, basePrice: 50000, grade: 'OG' }
+        // --- 2. 게임 데이터 및 상태 변수 ---
+        let audioCtx;
+
+        const RARITY_SETTINGS = {
+            'general':      { chance: 10000, color: '#9ca3af', sellMultiplier: 1, epsMultiplier: 1 },
+            'rare':         { chance: 5000,  color: '#16a34a', sellMultiplier: 2, epsMultiplier: 2 },
+            'lesser-rare':  { chance: 2500,  color: '#2563eb', sellMultiplier: 5, epsMultiplier: 5 },
+            'legendary':    { chance: 500,   color: '#facc15', sellMultiplier: 20, epsMultiplier: 20 },
+            'mystic':       { chance: 100,   color: '#9333ea', sellMultiplier: 50, epsMultiplier: 50 },
+            'transcendent': { chance: 10,    color: '#f97316', sellMultiplier: 200, epsMultiplier: 200 },
+            'god':          { chance: 1,     color: '#ff0000', sellMultiplier: 1000, epsMultiplier: 1000 },
+            'secret':       { chance: 0.1,   color: '#ffffff', sellMultiplier: 5000, epsMultiplier: 5000 },
+            'og':           { chance: 0.00000001, color: '#d4af37', sellMultiplier: 100000, epsMultiplier: 100000 }
         };
 
-        const gachaRates = [
-            { rarity: 'general', rate: 0.50 },
-            { rarity: 'lesser-rare', rate: 0.25 },
-            { rarity: 'rare', rate: 0.15 },
-            { rarity: 'legendary', rate: 0.07 },
-            { rarity: 'mystic', rate: 0.02 },
-            { rarity: 'transcendent', rate: 0.005 },
-            { rarity: 'god', rate: 0.003 },
-            { rarity: 'secret', rate: 0.0019 },
-            { rarity: 'og', rate: 0.0001 }
+        const GRADE_SETTINGS = {
+            'general': { name: '일반', multiplier: 1, chanceDivider: 1 },
+            'gold':    { name: '골드', multiplier: 3, chanceDivider: 10 },
+            'diamond': { name: '다이아', multiplier: 4, chanceDivider: 20 },
+            'rainbow': { name: '무지개', multiplier: 10, chanceDivider: 40 }
+        };
+
+        const items = [
+            { id: 1, name: "낡은 컵", emoji: "☕", rarity: "general", description: "오래되어 빛바랜 컵입니다.", baseEps: 1 },
+            { id: 2, name: "돌멩이", emoji: "🗿", rarity: "general", description: "흔하디 흔한 돌멩이입니다.", baseEps: 2 },
+            { id: 3, name: "먼지 뭉치", emoji: "☁️", rarity: "general", description: "오랫동안 청소하지 않은 곳에서 발견됩니다.", baseEps: 1.5 },
+            { id: 4, name: "닳은 동전", emoji: "💲", rarity: "rare", description: "닳고 닳아 문양이 희미한 동전입니다.", baseEps: 5 },
+            { id: 5, name: "지우개", emoji: "✏️", rarity: "rare", description: "잘못된 부분을 바로잡아주는 도구입니다.", baseEps: 7 },
+            { id: 6, name: "유리 조각", emoji: "🧊", rarity: "rare", description: "햇빛에 비추면 영롱하게 빛납니다.", baseEps: 6 },
+            { id: 7, name: "새싹 화분", emoji: "🌱", rarity: "lesser-rare", description: "생명력이 가득한 작은 화분입니다.", baseEps: 15 },
+            { id: 8, name: "빛나는 보석", emoji: "💎", rarity: "lesser-rare", description: "영롱한 빛을 내는 보석입니다.", baseEps: 20 },
+            { id: 9, name: "마법의 램프", emoji: "🧞", rarity: "legendary", description: "문지르면 소원이 이루어진다는 전설의 램프입니다.", baseEps: 100 },
+            { id: 10, name: "전설의 검", emoji: "⚔️", rarity: "legendary", description: "영웅이 사용했다는 전설적인 검입니다.", baseEps: 120 },
+            { id: 11, name: "신비로운 스크롤", emoji: "📜", rarity: "mystic", description: "고대의 지식이 봉인되어 있습니다.", baseEps: 500 },
+            { id: 12, name: "현자의 돌", emoji: "🔮", rarity: "mystic", description: "만물을 황금으로 바꿀 수 있다는 소문이 있습니다.", baseEps: 600 },
+            { id: 13, name: "불사조의 깃털", emoji: "🪶", rarity: "transcendent", description: "꺼지지 않는 불꽃의 힘을 머금고 있습니다.", baseEps: 2500 },
+            { id: 14, name: "세계수의 잎사귀", emoji: "🌿", rarity: "transcendent", description: "세상의 모든 생명력과 연결되어 있습니다.", baseEps: 3000 },
+            { id: 15, name: "태초의 빛", emoji: "🌟", rarity: "god", description: "세상이 창조될 때의 순수한 빛의 결정체입니다.", baseEps: 10000 },
+            { id: 16, name: "심연의 어둠", emoji: "🌑", rarity: "god", description: "모든 것을 집어삼키는 근원적인 어둠입니다.", baseEps: 11000 },
+            { id: 17, name: "시간의 모래시계", emoji: "⏳", rarity: "god", description: "과거와 미래를 넘나들 수 있는 힘을 지녔습니다.", baseEps: 12000 },
+            { id: 18, name: "공간의 왜곡", emoji: "🌀", rarity: "god", description: "차원의 경계를 허무는 위험한 힘을 담고 있습니다.", baseEps: 13000 },
+            { id: 19, name: "???", emoji: "❓", rarity: "secret", description: "아직 아무도 정체를 밝혀내지 못한 미지의 아이템입니다.", baseEps: 50000 },
+            { id: 20, name: "kiwihacker의 뱃지", emoji: "🥝", rarity: "og", description: "전설적인 해커 kiwihacker가 남긴 뱃지. 서버의 모든 권한이 담겨있습니다.", baseEps: 1000000 },
+            { id: 21, name: "양두영", emoji: "👤", rarity: "og", description: "신화 속 인물, 양두영. 만물을 다스리는 힘을 지녔다고 합니다.", baseEps: 1000000 }
         ];
 
-        let gameState = {
+        // 100개의 미션 생성
+        const ALL_MISSIONS = [
+            // 뽑기 미션
+            ...[10, 50, 100, 200, 500, 1000, 2000, 5000, 10000, 20000].map((n, i) => ({ id: `pull_${n}`, title: `뽑기 ${n}회 하기`, type: 'pulls', target: n, reward: n * 100 * (i + 1) })),
+            // 코인 획득 미션
+            ...[10000, 50000, 100000, 500000, 1000000, 10000000, 100000000].map((n, i) => ({ id: `earn_coins_${n}`, title: `총 ${n.toLocaleString()} 코인 획득하기`, type: 'coins_earned', target: n, reward: n / 10 * (i + 1) })),
+            // 돈 벌기 미션
+            ...[10000, 50000, 100000, 500000, 1000000, 10000000].map((n, i) => ({ id: `collect_${n}`, title: `돈 벌기로 ${n.toLocaleString()} 코인 수집하기`, type: 'uncollected_coins', target: n, reward: n / 5 * (i + 1) })),
+            // 강화 미션
+            ...[1, 5, 10, 20, 50, 100].map((n, i) => ({ id: `combine_${n}`, title: `아이템 강화 ${n}회 하기`, type: 'combines', target: n, reward: n * 2000 * (i + 1) })),
+            // 등급 획득 미션
+            ...['gold', 'diamond', 'rainbow'].flatMap(grade => [1, 5, 10, 20, 50].map((n, i) => ({ id: `get_${grade}_${n}`, title: `${GRADE_SETTINGS[grade].name} 등급 아이템 ${n}개 얻기`, type: `grade_${grade}`, target: n, reward: n * 10000 * (i + 1) * GRADE_SETTINGS[grade].multiplier }))),
+            // 희귀도 획득 미션
+            ...['legendary', 'mystic', 'transcendent', 'god', 'secret'].flatMap(rarity => [1, 3, 5, 10].map((n, i) => ({ id: `get_${rarity}_${n}`, title: `${rarity} 등급 아이템 ${n}개 얻기`, type: `rarity_${rarity}`, target: n, reward: n * 50000 * (i + 1) * RARITY_SETTINGS[rarity].sellMultiplier }))),
+            // 레벨 달성 미션
+            ...[...new Set(items.map(item => item.id))].map(id => ({ id: `reach_level3_${id}`, title: `${items.find(i=>i.id===id).name} Lv.3 달성하기`, type: `level3_${id}`, target: 1, reward: 1000000 })),
+            // 기타 미션
+            { id: 'minigame_100', title: '미니게임에서 100점 이상 달성', type: 'minigame_score', target: 100, reward: 50000 },
+        ].slice(0, 100); // 100개로 제한
+        
+        let gachaPool = [];
+        
+        const initialState = {
             coins: 1000,
             inventory: [],
-            pokedex: {},
-            pulls: 0,
-            totalItemsSold: 0,
-            moneyMaking: {
-                slots: [null, null, null, null, null, null, null, null, null, null],
-                uncollected: 0,
-                lastCollectTime: Date.now()
-            },
-            missions: [
-                { id: 1, name: "뽑기 10회 하기", completed: false, reward: 500 },
-                { id: 2, name: "5종류의 아이템 수집", completed: false, reward: 1000 },
-                { id: 3, name: "코인 10,000개 획득", completed: false, reward: 2000 },
-                { id: 4, name: "아이템 5개 판매", completed: false, reward: 1500 },
-                { id: 5, name: "골드 등급 아이템 획득", completed: false, reward: 3000 }
+            pokedex: {}, // { '1-general': { count: 5, maxLevel: 2 }, '1-gold': { count: 1, maxLevel: 1 } }
+            missionProgress: {},
+            moneyMaking: { slots: new Array(10).fill(null), uncollected: 0, lastCheck: Date.now() },
+            luckBuff: { isActive: false, endTime: 0 },
+            messages: [
+                { id: Date.now(), title: '게임에 오신 것을 환영합니다!', content: '럭키 뽑기 머신에 오신 것을 환영합니다! 뽑기를 통해 다양한 아이템을 모아보세요!', read: false, reward: null, claimed: true },
             ],
-            messages: [],
-            lastLogin: Date.now(),
-            settings: {
-                cutscene: true,
-                sound: true,
-                notification: true
-            },
-            luckBuff: {
-                active: false,
-                endTime: 0
+            settings: { cutscene: true, sound: true, notification: true },
+            adminEnabled: false,
+            gameCleared: false,
+            clearProgress: {
+                key1: false, // 100 미션
+                key2: false, // 키위해커
+                key3: false, // 양두영
+                key4: false, // 1경원
+                key5: false, // 시크릿 3렙
             },
             kiwiHunt: {
-                found: [false, false, false, false, false],
-                lastFoundTime: 0
+                unlocked: false,
+                found: [], // 'settings', 'pokedex-secret', 'pokedex-cup', 'shop', 'money-making'
+            },
+            stats: {
+                total_pulls: 0,
+                total_coins_earned: 0,
+                total_combines: 0,
+                minigame_highscore: 0,
             }
         };
 
-        let activeTab = 'inventory';
-        let activePokedexGrade = 'general';
-        let activeShopTab = 'buy';
-        let activeSettingsSubtab = 'settings-main';
-        let activeMissionTab = 'active';
-        let selectedItems = [];
-        let itemSelectionCallback = null;
-        let audioCtx = null;
-        let cutsceneEffect = null;
-        let secretCodes = {
-            'OGKIWI': () => {
-                if (gameState.pokedex['og_item'] && gameState.pokedex['og_item'].count > 0) {
-                    codeMessageEl.textContent = '이미 OG 아이템을 가지고 있습니다!';
-                    codeMessageEl.style.color = 'red';
-                    return;
-                }
-                const item = {...itemData['og_item'], level: 1};
-                addItemToInventory(item);
-                showSystemMessage('admin', 'OG 아이템을 획득했습니다!');
-                codeMessageEl.textContent = 'OG 아이템을 획득했습니다!';
-                codeMessageEl.style.color = 'lime';
-                setTimeout(() => hideModal(codeInputModal), 1500);
-            },
-            'ADMINMODE': () => {
-                adminPanelButton.classList.remove('hidden');
-                codeMessageEl.textContent = '관리자 모드를 활성화했습니다.';
-                codeMessageEl.style.color = 'lime';
-                setTimeout(() => hideModal(codeInputModal), 1500);
-            },
-            'CLEARKIWI': () => {
-                gameState.kiwiHunt.found = [true, true, true, true, true];
-                checkKiwiHuntCompletion();
-                codeMessageEl.textContent = '키위를 모두 찾았습니다!';
-                codeMessageEl.style.color = 'lime';
-                setTimeout(() => hideModal(codeInputModal), 1500);
-            }
-        };
+        let gameState;
 
-        // --- 3. 기본 유틸리티 함수 ---
+        // --- 3. 로컬 저장소 관리 ---
         function saveGame() {
-            localStorage.setItem('luckyGachaGameState', JSON.stringify(gameState));
-            console.log('게임 저장됨');
+            localStorage.setItem('luckyGachaGameFixed', JSON.stringify(gameState));
         }
 
         function loadGame() {
-            const savedState = localStorage.getItem('luckyGachaGameState');
+            const savedState = localStorage.getItem('luckyGachaGameFixed');
             if (savedState) {
                 gameState = JSON.parse(savedState);
-                console.log('게임 불러옴');
-            }
-        }
-
-        function formatNumber(num) {
-            return num.toLocaleString();
-        }
-
-        function showModal(modal) {
-            modal.style.display = 'flex';
-        }
-
-        function hideModal(modal) {
-            modal.style.display = 'none';
-        }
-
-        function showConfirmModal(title, text, onYes, onNo = null) {
-            confirmModalTitle.textContent = title;
-            confirmModalText.textContent = text;
-            confirmModalYes.onclick = () => { onYes(); hideModal(confirmModal); };
-            confirmModalNo.onclick = () => { if (onNo) onNo(); hideModal(confirmModal); };
-            showModal(confirmModal);
-        }
-
-        function playSound(type) {
-            if (!gameState.settings.sound || !audioCtx) return;
-            let frequency = 0;
-            let duration = 0.1;
-            switch (type) {
-                case 'pull': frequency = 440; duration = 0.05; break;
-                case 'ding': frequency = 880; duration = 0.1; break;
-                case 'error': frequency = 220; duration = 0.2; break;
-                case 'level-up': frequency = 1000; duration = 0.3; break;
-                case 'clear':
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    osc.type = 'triangle';
-                    
-                    const now = audioCtx.currentTime;
-                    osc.frequency.setValueAtTime(523.25, now);
-                    gain.gain.setValueAtTime(0.5, now);
-                    osc.frequency.linearRampToValueAtTime(659.25, now + 0.1);
-                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
-                    osc.start();
-                    osc.stop(now + 0.5);
-                    return;
-            }
-            if (frequency > 0) {
-                const oscillator = audioCtx.createOscillator();
-                const gainNode = audioCtx.createGain();
+                // 데이터 구조 업데이트
+                if (!gameState.missionProgress) gameState.missionProgress = {};
+                if (!gameState.pokedex) gameState.pokedex = {};
+                if (!gameState.moneyMaking) gameState.moneyMaking = initialState.moneyMaking;
+                if (!gameState.luckBuff) gameState.luckBuff = initialState.luckBuff;
+                if (!gameState.messages) gameState.messages = initialState.messages;
+                if (!gameState.settings) gameState.settings = initialState.settings;
+                if (typeof gameState.adminEnabled === 'undefined') gameState.adminEnabled = false;
+                if (typeof gameState.gameCleared === 'undefined') gameState.gameCleared = false;
+                if (!gameState.clearProgress) gameState.clearProgress = initialState.clearProgress;
+                if (!gameState.kiwiHunt) gameState.kiwiHunt = initialState.kiwiHunt;
+                if (!gameState.stats) gameState.stats = initialState.stats;
                 
-                oscillator.type = 'sine';
-                oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
-                
-                gainNode.gain.setValueAtTime(0.5, audioCtx.currentTime);
-                gainNode.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-                
-                oscillator.connect(gainNode);
-                gainNode.connect(audioCtx.destination);
-                
-                oscillator.start();
-                oscillator.stop(audioCtx.currentTime + duration);
-            }
-        }
-
-        function showSystemMessage(title, content, reward = null) {
-            const message = {
-                title: title,
-                content: content,
-                timestamp: Date.now(),
-                read: false,
-                reward: reward
-            };
-            gameState.messages.unshift(message);
-            updateMessageNotification();
-            saveGame();
-            if (gameState.settings.notification) {
-                // 알림 표시 로직 (예: alert)
-                console.log(`새 메시지: [${title}] ${content}`);
-            }
-        }
-        
-        function updateMessageNotification() {
-            const hasUnread = gameState.messages.some(msg => !msg.read);
-            messageNotificationDot.style.display = hasUnread ? 'block' : 'none';
-            messageSubtabDot.style.display = hasUnread ? 'block' : 'none';
-        }
-
-        function showCutscene(item) {
-            if (!gameState.settings.cutscene || item.rarityValue < 10) return; // 미스틱 등급 이상만 컷씬
-            
-            const effectMap = {
-                'mystic': 'dark',
-                'transcendent': 'time',
-                'god': 'light',
-                'secret': 'light',
-                'og': 'light'
-            };
-
-            cutsceneEffect = effectMap[item.rarity];
-            
-            cutsceneEmoji.textContent = item.emoji;
-            cutsceneName.textContent = item.name;
-            cutsceneRarity.textContent = `[${item.rarity.toUpperCase()}]`;
-            
-            // 등급별 스타일 적용
-            cutsceneRarity.className = `cutscene-rarity rarity-${item.rarity}`;
-            cutsceneEmoji.className = `cutscene-emoji rarity-${item.rarity}`;
-
-            // 파티클 효과 생성
-            cutsceneParticles.innerHTML = '';
-            let particleCount = 20;
-            if (item.rarity === 'god') particleCount = 50;
-
-            for (let i = 0; i < particleCount; i++) {
-                const particle = document.createElement('div');
-                particle.style.animationDelay = `${i * 0.05}s`;
-                
-                if (cutsceneEffect === 'light') {
-                    particle.className = 'sparkle';
-                    const x = (Math.random() - 0.5) * 600;
-                    const y = (Math.random() - 0.5) * 600;
-                    particle.style.setProperty('--x', `${x}px`);
-                    particle.style.setProperty('--y', `${y}px`);
-                } else if (cutsceneEffect === 'dark') {
-                    particle.className = 'tendril';
-                    const rStart = Math.random() * 360;
-                    const rEnd = rStart + 180 + (Math.random() - 0.5) * 60;
-                    particle.style.setProperty('--r-start', `${rStart}deg`);
-                    particle.style.setProperty('--r-end', `${rEnd}deg`);
-                } else if (cutsceneEffect === 'time') {
-                    particle.className = 'sand';
-                    const xStart = (Math.random() - 0.5) * 200;
-                    const xEnd = xStart + (Math.random() - 0.5) * 100;
-                    particle.style.setProperty('--x-start', `${xStart}px`);
-                    particle.style.setProperty('--x-end', `${xEnd}px`);
-                }
-                
-                cutsceneParticles.appendChild(particle);
-            }
-
-            cutsceneOverlay.classList.add('active');
-            playSound('clear');
-            
-            setTimeout(() => {
-                cutsceneOverlay.classList.remove('active');
-            }, 6000);
-        }
-        
-        // --- 4. 게임 로직 ---
-        function selectGachaResult() {
-            const totalRate = gachaRates.reduce((sum, r) => sum + r.rate, 0);
-            let random = Math.random() * totalRate;
-
-            if (gameState.luckBuff.active) {
-                const buffedRates = gachaRates.map(item => {
-                    let rate = item.rate;
-                    if (item.rarityValue > 1) {
-                        rate = item.rate * 4;
+                // 미션 데이터 초기화/업데이트
+                ALL_MISSIONS.forEach(mission => {
+                    if (!gameState.missionProgress[mission.id]) {
+                        gameState.missionProgress[mission.id] = { progress: 0, completed: false };
                     }
-                    return { ...item, rate };
                 });
-                const totalBuffedRate = buffedRates.reduce((sum, r) => sum + r.rate, 0);
-                random = Math.random() * totalBuffedRate;
-                
-                for (const rate of buffedRates) {
-                    if (random < rate.rate) {
-                        const itemsOfRarity = Object.keys(itemData).filter(key => itemData[key].rarity === rate.rarity);
-                        const selectedKey = itemsOfRarity[Math.floor(Math.random() * itemsOfRarity.length)];
-                        return { id: selectedKey, ...itemData[selectedKey] };
-                    }
-                    random -= rate.rate;
+
+                // 오프라인 수익 계산
+                const now = Date.now();
+                const lastCheck = gameState.moneyMaking.lastCheck || now;
+                const elapsedTime = (now - lastCheck) / 1000;
+                let currentEPS = 0;
+                if(gameState.moneyMaking && gameState.moneyMaking.slots) {
+                    gameState.moneyMaking.slots.forEach(item => { if (item) currentEPS += calculateEPS(item); });
                 }
+                const offlineEarnings = currentEPS * elapsedTime;
+                if (offlineEarnings > 0) {
+                    gameState.moneyMaking.uncollected += offlineEarnings;
+                    addMessage({
+                        title: '오프라인 수익',
+                        content: `자리를 비운 동안 ${Math.floor(offlineEarnings).toLocaleString()} 코인을 벌었습니다!`,
+                    });
+                }
+                gameState.moneyMaking.lastCheck = now;
             } else {
-                for (const rate of gachaRates) {
-                    if (random < rate.rate) {
-                        const itemsOfRarity = Object.keys(itemData).filter(key => itemData[key].rarity === rate.rarity);
-                        const selectedKey = itemsOfRarity[Math.floor(Math.random() * itemsOfRarity.length)];
-                        return { id: selectedKey, ...itemData[selectedKey] };
-                    }
-                    random -= rate.rate;
-                }
+                resetGame();
             }
-            return { id: 'eggplant', ...itemData['eggplant'] }; // fallback
         }
 
-        function pullGacha(count = 1) {
-            const cost = 100 * count;
-            if (gameState.coins < cost) {
-                gachaResult.textContent = '코인이 부족합니다!';
-                gachaResult.style.color = '#ef4444';
-                setTimeout(() => gachaResult.textContent = '', 2000);
-                playSound('error');
-                return;
-            }
-
-            gameState.coins -= cost;
-            gameState.pulls += count;
-            gachaResult.classList.remove('show');
-            
-            if (count === 1) {
-                gachaResult.style.backgroundColor = 'rgba(0,0,0,0.7)';
-                gachaResult.innerHTML = `<span id="result-emoji" class="text-6xl mb-2">...</span><span id="result-text" class="result-name">뽑는 중...</span>`;
-                playSound('pull');
-                
-                setTimeout(() => {
-                    const result = selectGachaResult();
-                    addItemToInventory(result);
-                    updateGachaDisplay(result);
-                    showCutscene(result);
-                }, 1000);
-            } else if (count === 10) {
-                let results = [];
-                for(let i=0; i<11; i++) {
-                    results.push(selectGachaResult());
-                }
-                const ogResult = results.find(r => r.rarity === 'og');
-                
-                let showResult = results.sort((a, b) => b.rarityValue - a.rarityValue)[0];
-                if (ogResult) {
-                    showResult = ogResult;
-                }
-
-                gachaResult.style.backgroundColor = 'rgba(0,0,0,0.7)';
-                gachaResult.innerHTML = `<span id="result-emoji" class="text-6xl mb-2">...</span><span id="result-text" class="result-name">뽑는 중...</span>`;
-                playSound('pull');
-                
-                setTimeout(() => {
-                    results.forEach(item => addItemToInventory(item));
-                    updateGachaDisplay(showResult, results.length);
-                    showCutscene(showResult);
-                }, 1000);
-            }
-        }
-        
-        function updateGachaDisplay(item, count = 1) {
-            resultEmoji.textContent = item.emoji;
-            let resultName = item.name;
-            if (item.grade) {
-                 resultName += ` (${item.grade})`;
-            }
-            if (count > 1) {
-                resultName += ` 외 ${count - 1}개`;
-            }
-            resultText.textContent = resultName;
-            
-            gachaResult.className = `gacha-result show rarity-${item.rarity}`;
-            
-            if (item.rarityValue >= 50) { // 무지개 등급 이상
-                createParticles(item.rarity);
-            }
-            updateUI();
-        }
-        
-        function createParticles(rarity) {
-            particleContainer.innerHTML = '';
-            let particleClass = '';
-            let count = 20;
-
-            if (rarity === 'transcendent') {
-                particleClass = 'particle-rainbow';
-            } else if (rarity === 'god') {
-                particleClass = 'particle-rainbow';
-                count = 50;
-            } else if (rarity === 'og' || rarity === 'secret') {
-                particleClass = 'particle-gold';
-                count = 100;
-            } else if (rarity === 'mystic') {
-                particleClass = 'particle-diamond';
-            } else if (rarity === 'legendary') {
-                particleClass = 'particle-gold';
-            } else {
-                return;
-            }
-
-            for (let i = 0; i < count; i++) {
-                const particle = document.createElement('div');
-                particle.className = `particle ${particleClass}`;
-                const x = Math.random() * 100 - 50;
-                const y = Math.random() * 100 - 50;
-                particle.style.left = `calc(50% + ${x}px)`;
-                particle.style.top = `calc(50% + ${y}px)`;
-                particle.style.animationDelay = `${Math.random() * 0.5}s`;
-                particleContainer.appendChild(particle);
-            }
-        }
-        
-        function addItemToInventory(item) {
-            const existingItem = gameState.inventory.find(invItem => invItem.id === item.id && invItem.level === 1);
-            if (existingItem) {
-                existingItem.count++;
-            } else {
-                gameState.inventory.push({ ...item, id: item.id, count: 1, level: 1 });
-            }
-            
-            if (gameState.pokedex[item.id]) {
-                gameState.pokedex[item.id].count++;
-                if (item.rarityValue > gameState.pokedex[item.id].maxRarityValue) {
-                    gameState.pokedex[item.id].maxRarityValue = item.rarityValue;
-                }
-            } else {
-                gameState.pokedex[item.id] = {
-                    count: 1,
-                    maxLevel: 1,
-                    firstAcquired: Date.now(),
-                    rarityValue: item.rarityValue,
-                    grade: item.grade,
-                    name: item.name,
-                    emoji: item.emoji,
-                    rarity: item.rarity,
-                    basePrice: item.basePrice,
-                    description: item.description || "이 아이템에 대한 설명은 아직 없습니다."
-                };
-            }
+        function resetGame() {
+            gameState = JSON.parse(JSON.stringify(initialState));
+            ALL_MISSIONS.forEach(mission => {
+                gameState.missionProgress[mission.id] = { progress: 0, completed: false };
+            });
             saveGame();
+        }
+
+        // --- 4. 게임 로직 ---
+
+        // 뽑기 풀 생성 (게임 시작 시 한 번만 호출)
+        function createGachaPool() {
+            gachaPool = [];
+            items.forEach(item => {
+                const itemRarityChance = RARITY_SETTINGS[item.rarity].chance;
+                Object.keys(GRADE_SETTINGS).forEach(grade => {
+                    const gradeDivider = GRADE_SETTINGS[grade].chanceDivider;
+                    const finalChance = itemRarityChance / gradeDivider;
+                    gachaPool.push({
+                        ...item,
+                        grade: grade,
+                        chance: finalChance,
+                    });
+                });
+            });
+        }
+
+        function getWeightedRandomItem() {
+            const luckFactor = gameState.luckBuff.isActive ? 4 : 1;
+
+            const adjustedPool = gachaPool.map(item => {
+                let adjustedChance = item.chance;
+                // 희귀도가 높거나 등급이 높을수록 행운 버프 효과 증폭
+                if (luckFactor > 1) {
+                    if(item.rarity !== 'general') adjustedChance *= luckFactor;
+                    if(item.grade !== 'general') adjustedChance *= luckFactor;
+                }
+                return { ...item, adjustedChance: adjustedChance };
+            });
+
+            const totalWeight = adjustedPool.reduce((sum, item) => sum + item.adjustedChance, 0);
+            let random = Math.random() * totalWeight;
+
+            for (const item of adjustedPool) {
+                if (random < item.adjustedChance) {
+                    return { ...item, level: 1 }; // 뽑힌 아이템은 항상 1레벨
+                }
+                random -= item.adjustedChance;
+            }
+        }
+        
+        function pull(count = 1) {
+            const isTenPull = count > 1;
+            const cost = isTenPull ? 1000 : 100;
+            const pullCount = isTenPull ? 11 : 1;
+
+            if (gameState.coins < cost) {
+                showStatusMessage('코인이 부족합니다!', 'red');
+                return;
+            }
+            
+            gameState.coins -= cost;
+            const pulledItems = [];
+            
+            for (let i = 0; i < pullCount; i++) {
+                const item = getWeightedRandomItem();
+                pulledItems.push(item);
+                addItemToInventory(item);
+            }
+            
+            updateMissionProgress('pulls', pullCount);
+            
+            if (!isTenPull) {
+                showCutscene(pulledItems[0]);
+            } else {
+                // TODO: 10+1 뽑기 결과 표시 UI (현재는 메시지로 대체)
+                showStatusMessage(`${pullCount}개의 아이템을 뽑았습니다!`, 'green');
+                // 가장 희귀한 아이템으로 컷씬 보여주기
+                pulledItems.sort((a,b) => b.chance - a.chance);
+                playGachaAnimation(pulledItems[0]);
+            }
+            
+            updateUI();
+            saveGame();
+        }
+
+        function addItemToInventory(item) {
+            const invItem = gameState.inventory.find(i => i.id === item.id && i.grade === item.grade && i.level === item.level);
+            if (invItem) {
+                invItem.count++;
+            } else {
+                gameState.inventory.push({ id: item.id, grade: item.grade, level: item.level, count: 1 });
+            }
+            
+            updatePokedex(item);
+            updateMissionProgress(`grade_${item.grade}`, 1);
+            updateMissionProgress(`rarity_${item.rarity}`, 1);
+
+            // 클리어 조건 체크
+            if(item.id === 20 && !gameState.kiwiHunt.unlocked) { // 키위해커
+                gameState.kiwiHunt.unlocked = true;
+                addMessage({
+                    title: '숨겨진 기운',
+                    content: 'kiwihacker의 뱃지를 얻자 세상 곳곳에 숨겨져 있던 키위의 기운이 느껴지기 시작합니다...'
+                });
+            }
+            if(item.id === 21 && !gameState.clearProgress.key3) { // 양두영
+                addMessage({
+                    title: '양을 숭배하라~!',
+                    content: '전설 속의 인물, 양두영을 손에 넣었습니다!',
+                    reward: { type: 'clearKey', key: 3 }
+                });
+            }
+        }
+        
+        function updatePokedex(item) {
+            const pokedexKey = `${item.id}-${item.grade}`;
+            if (!gameState.pokedex[pokedexKey]) {
+                gameState.pokedex[pokedexKey] = { count: 0, maxLevel: 0 };
+            }
+            gameState.pokedex[pokedexKey].count++;
+            if (item.level > gameState.pokedex[pokedexKey].maxLevel) {
+                 gameState.pokedex[pokedexKey].maxLevel = item.level;
+            }
         }
 
         function combineItems() {
-            if (selectedItems.length !== 3) {
-                showSystemMessage('경고', '강화하려면 같은 아이템 3개를 선택해야 합니다.');
+            const selectedCards = Array.from(contentInventory.querySelectorAll('.item-card.selected'));
+            if (selectedCards.length === 0) {
+                 showStatusMessage('강화할 아이템을 선택하세요.', 'red');
+                 return;
+            }
+
+            const card = selectedCards[0];
+            const itemId = parseInt(card.dataset.itemId);
+            const itemGrade = card.dataset.itemGrade;
+            const itemLevel = parseInt(card.dataset.itemLevel);
+
+            const inventoryItem = gameState.inventory.find(item => item.id === itemId && item.grade === itemGrade && item.level === itemLevel);
+            
+            if (!inventoryItem || inventoryItem.count < 3) {
+                 showStatusMessage('선택된 아이템의 개수가 부족합니다. (3개 필요)', 'red');
+                 return;
+            }
+            
+            if (itemLevel >= 3) {
+                showStatusMessage('최대 레벨에 도달한 아이템입니다.', 'red');
                 return;
             }
-            const itemToCombine = selectedItems[0];
-            const nextLevel = itemToCombine.level + 1;
-            if (nextLevel > 3) {
-                showSystemMessage('경고', '더 이상 강화할 수 없습니다.');
-                return;
+
+            inventoryItem.count -= 3;
+            if(inventoryItem.count === 0) {
+                gameState.inventory = gameState.inventory.filter(i => i !== inventoryItem);
             }
+            
+            const newLevel = itemLevel + 1;
+            const upgradedItem = { id: itemId, grade: itemGrade, level: newLevel, count: 1 };
 
-            // 인벤토리에서 3개 아이템 제거
-            for (let i = 0; i < 3; i++) {
-                const index = gameState.inventory.findIndex(invItem => 
-                    invItem.id === itemToCombine.id && invItem.level === itemToCombine.level);
-                if (index > -1) {
-                    if (gameState.inventory[index].count > 1) {
-                        gameState.inventory[index].count--;
-                    } else {
-                        gameState.inventory.splice(index, 1);
-                    }
-                }
-            }
-
-            // 새 레벨 아이템 추가 또는 수량 증가
-            const upgradedItem = { ...itemToCombine, level: nextLevel, count: 1 };
-            const existingUpgradedItem = gameState.inventory.find(invItem => 
-                invItem.id === upgradedItem.id && invItem.level === upgradedItem.level);
-
-            if (existingUpgradedItem) {
-                existingUpgradedItem.count++;
+            const existingUpgraded = gameState.inventory.find(i => i.id === itemId && i.grade === itemGrade && i.level === newLevel);
+            if (existingUpgraded) {
+                existingUpgraded.count++;
             } else {
                 gameState.inventory.push(upgradedItem);
             }
             
-            // 도감 업데이트
-            const pokedexEntry = gameState.pokedex[itemToCombine.id];
-            if (pokedexEntry) {
-                pokedexEntry.maxLevel = nextLevel;
+            const pokedexKey = `${itemId}-${itemGrade}`;
+            if(!gameState.pokedex[pokedexKey]) {
+                gameState.pokedex[pokedexKey] = { count: 0, maxLevel: 0 };
             }
+            if (newLevel > gameState.pokedex[pokedexKey].maxLevel) {
+                gameState.pokedex[pokedexKey].maxLevel = newLevel;
+            }
+            
+            showStatusMessage('아이템 강화 성공!', 'green');
+            
+            updateMissionProgress('combines', 1);
+            updateMissionProgress(`level3_${itemId}`, 1);
 
-            showSystemMessage('강화 성공', `${itemToCombine.name} Lv.${itemToCombine.level} 3개가 Lv.${nextLevel}로 강화되었습니다!`);
-            selectedItems = [];
+            // 클리어 조건 체크
+            if(itemId === 19 && newLevel === 3 && !gameState.clearProgress.key5) { // 시크릿 3렙
+                addMessage({
+                    title: '운이 머선일이고?',
+                    content: '미지의 아이템을 최고 레벨까지 강화하는 데 성공했습니다!',
+                    reward: { type: 'clearKey', key: 5 }
+                });
+            }
+            
             updateUI();
-            playSound('level-up');
+            saveGame();
         }
-
-        function calculateSellPrice(item) {
-            if (!item || isNaN(item.level) || isNaN(item.rarityValue)) return NaN;
-            return Math.floor(item.basePrice * item.rarityValue * item.level * 0.5);
-        }
-
-        function sellItem(item) {
-            showConfirmModal('아이템 판매', `정말로 ${item.name} Lv.${item.level} 1개를 ${calculateSellPrice(item)} 코인에 판매하시겠습니까?`, () => {
-                const price = calculateSellPrice(item);
-                gameState.coins += price;
-                gameState.totalItemsSold++;
-                
-                const index = gameState.inventory.findIndex(invItem => 
-                    invItem.id === item.id && invItem.level === item.level);
-                
-                if (index > -1) {
-                    if (gameState.inventory[index].count > 1) {
-                        gameState.inventory[index].count--;
-                    } else {
-                        gameState.inventory.splice(index, 1);
-                    }
-                }
-                showSystemMessage('아이템 판매', `${item.name}을 ${price.toLocaleString()} 코인에 판매했습니다.`);
-                updateUI();
-            });
-        }
-
+        
         function calculateEPS(item) {
-            if (!item || isNaN(item.level) || isNaN(item.rarityValue)) return 0;
-            return Math.floor(item.basePrice * item.rarityValue * item.level * 0.1);
+            const itemData = items.find(i => i.id === item.id);
+            if (!itemData) return 0;
+
+            const gradeMultiplier = GRADE_SETTINGS[item.grade]?.multiplier || 1;
+            const levelMultiplier = item.level; // 1, 2, 3배
+            
+            return itemData.baseEps * gradeMultiplier * levelMultiplier;
         }
 
-        function getDailyCoins() {
-            const now = Date.now();
-            const oneDay = 24 * 60 * 60 * 1000;
-            if (now - gameState.lastLogin < oneDay) {
-                showSystemMessage('코인 받기', '코인은 하루에 한 번만 받을 수 있습니다.');
-                return;
-            }
-            gameState.coins += 500;
-            gameState.lastLogin = now;
-            showSystemMessage('코인 받기', '일일 코인 500개가 지급되었습니다!');
-            updateUI();
-            saveGame();
+        function getSellPrice(item) {
+            const itemData = items.find(i => i.id === item.id);
+            if (!itemData) return 0;
+            
+            const rarityMultiplier = RARITY_SETTINGS[itemData.rarity].sellMultiplier;
+            const gradeMultiplier = GRADE_SETTINGS[item.grade]?.multiplier || 1;
+            const levelMultiplier = item.level; // 1, 2, 3배
+            
+            // 기본 가격: 희귀도에 따라 차등
+            const basePrice = (items.length - items.findIndex(i => i.id === item.id)) * 10;
+            
+            return Math.floor(basePrice * rarityMultiplier * gradeMultiplier * levelMultiplier);
         }
 
-        function buyLuckBuff() {
-            const cost = 10000000;
-            if (gameState.coins < cost) {
-                showSystemMessage('구매 실패', '코인이 부족합니다!');
-                return;
-            }
-            gameState.coins -= cost;
-            gameState.luckBuff.active = true;
-            gameState.luckBuff.endTime = Date.now() + 30 * 60 * 1000;
-            showSystemMessage('아이템 구매', '행운 4배 버프를 획득했습니다! 30분 동안 지속됩니다.');
-            updateUI();
-            saveGame();
+        // --- 5. UI 렌더링 및 업데이트 ---
+        function updateUI() {
+            gameState.coins = Math.max(0, gameState.coins); // 코인이 음수가 되지 않도록
+            coinsElement.textContent = Math.floor(gameState.coins).toLocaleString();
+            renderInventory();
+            renderPokedex();
+            renderSellInventory();
+            renderMoneyMakingSlots();
+            updateTotalEps();
+            renderMissions();
+            renderMessages();
+            updateSettingsUI();
+            checkCombineButton();
+            updateKiwiHuntEmojis();
+            adminPanelButton.classList.toggle('hidden', !gameState.adminEnabled);
         }
 
-        function updateLuckBuffTimer() {
-            if (gameState.luckBuff.active) {
-                const remaining = Math.max(0, gameState.luckBuff.endTime - Date.now());
-                const minutes = Math.floor(remaining / 60000);
-                const seconds = Math.floor((remaining % 60000) / 1000);
-                luckBuffDisplay.classList.remove('hidden');
-                luckBuffTimer.textContent = `${minutes}분 ${seconds}초`;
-                if (remaining <= 0) {
-                    gameState.luckBuff.active = false;
-                    luckBuffDisplay.classList.add('hidden');
-                    showSystemMessage('버프 종료', '행운 4배 버프가 종료되었습니다.');
-                }
-            }
+        function getGradeTag(grade) {
+            if (grade === 'general') return '';
+            return ` (${GRADE_SETTINGS[grade].name})`;
         }
 
-        // --- 5. UI 렌더링 함수 ---
         function renderInventory() {
             contentInventory.innerHTML = '';
-            selectedItems = [];
-            
-            if (gameState.inventory.length === 0) {
-                contentInventory.innerHTML = '<p class="text-center text-gray-400 col-span-full">아직 수집한 아이템이 없습니다. 뽑기 머신을 사용해보세요!</p>';
-                return;
-            }
-
-            gameState.inventory.forEach(item => {
-                const card = document.createElement('div');
-                card.className = `item-card ${selectedItems.some(sel => sel.id === item.id && sel.level === item.level) ? 'selected' : ''} ${item.level === 2 ? 'level-2' : ''} ${item.level === 3 ? 'level-3' : ''}`;
-                if (item.level < 3 && item.count >= 3) {
-                    card.classList.add('combinable');
-                }
-                card.innerHTML = `
-                    <span class="text-4xl block">${item.emoji}</span>
-                    <p class="result-name mt-1">${item.name} Lv.${item.level}</p>
-                    <p class="text-xs text-gray-400">${item.rarity} 등급</p>
-                    <div class="absolute bottom-1 right-2 bg-gray-900 text-yellow-400 rounded-full px-2 py-1 text-xs font-bold">x${item.count}</div>
-                `;
-                card.onclick = () => toggleSelectItem(item);
-                contentInventory.appendChild(card);
+            const sortedInventory = gameState.inventory.sort((a,b) => {
+                const itemA = items.find(i => i.id === a.id);
+                const itemB = items.find(i => i.id === b.id);
+                const rarityA = Object.values(RARITY_SETTINGS).findIndex(r => r.chance === RARITY_SETTINGS[itemA.rarity].chance);
+                const rarityB = Object.values(RARITY_SETTINGS).findIndex(r => r.chance === RARITY_SETTINGS[itemB.rarity].chance);
+                if (rarityA !== rarityB) return rarityA - rarityB;
+                if (a.id !== b.id) return a.id - b.id;
+                const gradeA = Object.keys(GRADE_SETTINGS).indexOf(a.grade);
+                const gradeB = Object.keys(GRADE_SETTINGS).indexOf(b.grade);
+                if(gradeA !== gradeB) return gradeA - gradeB;
+                return a.level - b.level;
             });
-            updateCombineButtonState();
+
+            sortedInventory.forEach(item => {
+                const itemData = items.find(i => i.id === item.id);
+                if (itemData) {
+                    const card = document.createElement('div');
+                    card.className = `item-card rarity-${itemData.rarity} item-grade-${item.grade} level-${item.level}`;
+                    card.dataset.itemId = item.id;
+                    card.dataset.itemGrade = item.grade;
+                    card.dataset.itemLevel = item.level;
+                    
+                    card.innerHTML = `
+                        <span class="text-4xl">${itemData.emoji}</span>
+                        <p class="text-sm font-bold truncate mt-2">${itemData.name}${getGradeTag(item.grade)}</p>
+                        <p class="text-xs text-gray-400">Lv.${item.level} | ${itemData.rarity}</p>
+                        <div class="absolute top-1 right-1 bg-gray-700 text-xs px-2 py-1 rounded-full">${item.count}</div>
+                    `;
+                    
+                    if (item.level < 3 && item.count >= 3) {
+                         card.classList.add('combinable');
+                    }
+                    
+                    card.addEventListener('click', () => {
+                        const currentSelected = contentInventory.querySelector('.item-card.selected');
+                        // 다른 아이템이 선택되어 있으면 선택 해제
+                        if(currentSelected && (currentSelected.dataset.itemId != item.id || currentSelected.dataset.itemGrade != item.grade || currentSelected.dataset.itemLevel != item.level)) {
+                            currentSelected.classList.remove('selected');
+                        }
+                        card.classList.toggle('selected');
+                        checkCombineButton();
+                    });
+                    contentInventory.appendChild(card);
+                }
+            });
         }
         
-        function toggleSelectItem(item) {
-            const index = selectedItems.findIndex(sel => sel.id === item.id && sel.level === item.level);
-            if (index > -1) {
-                selectedItems.splice(index, 1);
-            } else {
-                if (selectedItems.length < 3) {
-                    selectedItems.push(item);
-                } else {
-                    showSystemMessage('경고', '최대 3개의 아이템만 선택할 수 있습니다.');
+        function renderPokedex() {
+             const activeGradeEl = document.querySelector('.pokedex-grade-tab.active');
+             if(!activeGradeEl) return;
+             const activeGrade = activeGradeEl.dataset.grade;
+             pokedexGrid.innerHTML = '';
+             
+             items.forEach(item => {
+                // 시크릿, OG 등급은 획득하기 전까지 도감에 표시하지 않음
+                if ((item.rarity === 'secret' || item.rarity === 'og') && !Object.keys(gameState.pokedex).some(key => key.startsWith(`${item.id}-`))) {
                     return;
                 }
-            }
-            renderInventory();
-        }
 
-        function updateCombineButtonState() {
-            const allSame = selectedItems.length === 3 && selectedItems.every((val, i, arr) => val.id === arr[0].id && val.level === arr[0].level);
-            combineButton.disabled = !allSame || selectedItems[0].level >= 3;
-            if (combineButton.disabled) {
-                combineButton.textContent = '강화하기 (3개 소모)';
-            } else {
-                combineButton.textContent = `강화하기 (${selectedItems[0].name} Lv.${selectedItems[0].level} 3개 소모)`;
-            }
-        }
-
-        function renderPokedex() {
-            pokedexGrid.innerHTML = '';
-            const allItems = Object.values(itemData);
-            
-            const filteredItems = allItems.filter(item => {
-                const pokedexEntry = gameState.pokedex[item.id];
-                if (!pokedexEntry) {
-                    return activePokedexGrade === 'general';
-                }
-                return activePokedexGrade === pokedexEntry.grade.toLowerCase() || activePokedexGrade === 'all';
-            });
-            
-            filteredItems.forEach(item => {
-                const pokedexEntry = gameState.pokedex[item.id];
+                const pokedexKey = `${item.id}-${activeGrade}`;
+                const isSeen = gameState.pokedex[pokedexKey] && gameState.pokedex[pokedexKey].count > 0;
+                
                 const card = document.createElement('div');
-                card.className = `item-card pokedex-info-card ${item.rarity === 'og' ? 'og-pokedex' : ''}`;
-                card.onclick = () => renderPokedexInfoModal(item);
+                card.className = `item-card rarity-${item.rarity} item-grade-${activeGrade}`;
+                card.dataset.itemId = item.id;
+                card.dataset.itemGrade = activeGrade;
 
-                if (pokedexEntry) {
-                    card.innerHTML = `
-                        <span class="text-4xl block">${item.emoji}</span>
-                        <p class="result-name mt-1">${item.name}</p>
-                        <p class="text-xs text-gray-400">Lv. ${pokedexEntry.maxLevel}</p>
-                    `;
-                } else {
-                    card.innerHTML = `<span class="silhouette text-6xl block">?</span><p class="result-name mt-1">???</p>`;
+                card.innerHTML = `
+                    <span class="text-4xl">${isSeen ? item.emoji : '❓'}</span>
+                    <p class="text-sm font-bold truncate mt-2">${isSeen ? item.name + getGradeTag(activeGrade) : '???'}</p>
+                    <p class="text-xs text-gray-400">${isSeen ? item.rarity : '알 수 없음'}</p>
+                `;
+                
+                if (isSeen) {
+                    card.addEventListener('click', () => showPokedexInfo(item.id, activeGrade));
                 }
+                
                 pokedexGrid.appendChild(card);
-            });
+             });
         }
-        
-        function renderPokedexInfoModal(item) {
-            const pokedexEntry = gameState.pokedex[item.id];
+
+        function showPokedexInfo(itemId, grade) {
+            const itemData = items.find(i => i.id === itemId);
+            if(!itemData) return;
             
-            // 모달 초기화
-            pokedexInfoModal.className = 'modal';
-            pokedexInfoModal.querySelector('.modal-content').className = 'modal-content text-left';
+            const pokedexKey = `${itemId}-${grade}`;
+            const pokedexEntry = gameState.pokedex[pokedexKey] || { count: 0, maxLevel: 0 };
             
-            if (pokedexEntry) {
-                const itemGrade = itemData[item.id].grade;
-                pokedexInfoModal.querySelector('.modal-content').classList.add(`item-grade-${itemGrade.toLowerCase()}`);
-                
-                const itemNameWithGrade = `${item.name} ${item.grade ? `(${item.grade})` : ''}`;
-                pokedexItemName.textContent = itemNameWithGrade;
-                pokedexItemName.className = `text-2xl font-bold mb-2 text-center rarity-${item.rarity}`;
-                
-                pokedexItemCount.textContent = pokedexEntry.count.toLocaleString();
-                pokedexItemLevel.textContent = pokedexEntry.maxLevel;
-                pokedexItemRarity.textContent = pokedexEntry.rarity;
-                pokedexItemChance.textContent = `${(getGachaRate(item.rarity) * 100).toFixed(4)}%`;
-                pokedexItemDescription.textContent = item.description || "아직 설명이 없습니다.";
-                pokedexItemEps.textContent = calculateEPS({ ...item, level: pokedexEntry.maxLevel }).toLocaleString();
-            } else {
-                pokedexItemName.textContent = '???';
-                pokedexItemCount.textContent = '0';
-                pokedexItemLevel.textContent = '1';
-                pokedexItemRarity.textContent = '?';
-                pokedexItemChance.textContent = '?%';
-                pokedexItemDescription.textContent = '아직 발견되지 않은 아이템입니다.';
-                pokedexItemEps.textContent = '?';
-            }
+            pokedexItemName.textContent = itemData.name + getGradeTag(grade);
+            pokedexItemName.className = `text-2xl font-bold mb-2 text-center rarity-${itemData.rarity} item-grade-${grade}`;
+            pokedexItemCount.textContent = pokedexEntry.count + '개';
+            pokedexItemLevel.textContent = 'Lv.' + pokedexEntry.maxLevel;
+            pokedexItemRarity.textContent = itemData.rarity;
+
+            const baseChance = RARITY_SETTINGS[itemData.rarity].chance;
+            const gradeDivider = GRADE_SETTINGS[grade].chanceDivider;
+            const finalChance = baseChance / gradeDivider;
+            const totalWeight = gachaPool.reduce((sum, item) => sum + item.chance, 0);
+            const probability = (finalChance / totalWeight) * 100;
+
+            pokedexItemChance.textContent = (probability < 0.0001 ? probability.toExponential(2) : probability.toFixed(6)) + '%';
+            pokedexItemDescription.textContent = itemData.description;
+
+            const tempItem = { id: itemId, grade: grade, level: 1 };
+            pokedexItemEps.textContent = `${calculateEPS(tempItem).toLocaleString()}`;
+            
+            // 키위 이모지 표시 로직
+            const secretKiwi = document.querySelector('[data-hunt-location="pokedex-secret"]');
+            const cupKiwi = document.querySelector('[data-hunt-location="pokedex-cup"]');
+            secretKiwi.classList.toggle('hidden', !(gameState.kiwiHunt.unlocked && itemId === 19)); // ???
+            cupKiwi.classList.toggle('hidden', !(gameState.kiwiHunt.unlocked && itemId === 1)); // 낡은 컵
+
             showModal(pokedexInfoModal);
-        }
-        
-        function getGachaRate(rarity) {
-            let rateEntry = gachaRates.find(r => r.rarity === rarity);
-            if (gameState.luckBuff.active && rateEntry.rarityValue > 1) {
-                return rateEntry.rate * 4;
-            }
-            return rateEntry ? rateEntry.rate : 0;
         }
 
         function renderSellInventory() {
             sellInventoryGrid.innerHTML = '';
-            if (gameState.inventory.length === 0) {
-                sellInventoryGrid.innerHTML = '<p class="text-center text-gray-400 col-span-full">판매할 아이템이 없습니다.</p>';
-                return;
-            }
-            gameState.inventory.forEach(item => {
-                const card = document.createElement('div');
-                const price = calculateSellPrice(item);
-                card.className = 'item-card';
-                card.innerHTML = `
-                    <span class="text-4xl block">${item.emoji}</span>
-                    <p class="result-name mt-1">${item.name} Lv.${item.level}</p>
-                    <p class="text-sm text-gray-400">판매가: ${price.toLocaleString()} 코인</p>
-                    <div class="absolute bottom-1 right-2 bg-gray-900 text-yellow-400 rounded-full px-2 py-1 text-xs font-bold">x${item.count}</div>
-                `;
-                card.onclick = () => sellItem(item);
-                sellInventoryGrid.appendChild(card);
+            gameState.inventory.forEach(invItem => {
+                const itemData = items.find(i => i.id === invItem.id);
+                if (itemData) {
+                    const card = document.createElement('div');
+                    card.className = `item-card rarity-${itemData.rarity} item-grade-${invItem.grade}`;
+                    const sellPrice = getSellPrice(invItem);
+                    card.innerHTML = `
+                        <span class="text-4xl">${itemData.emoji}</span>
+                        <p class="text-sm font-bold truncate mt-2">${itemData.name}${getGradeTag(invItem.grade)}</p>
+                        <p class="text-xs text-gray-400">Lv.${invItem.level} | ${invItem.count}개</p>
+                        ${itemData.rarity === 'og'
+                            ? `<button class="interactable-button text-xs mt-2 w-full" disabled>판매 불가</button>`
+                            : `<button class="interactable-button bg-red-600 border-red-700 text-xs mt-2 w-full sell-btn" data-item-id="${invItem.id}" data-item-level="${invItem.level}" data-item-grade="${invItem.grade}">판매 (${sellPrice.toLocaleString()})</button>`
+                        }
+                    `;
+                    const sellBtn = card.querySelector('.sell-btn');
+                    if (sellBtn) {
+                        // Event listener is now delegated to the parent grid
+                    }
+                    sellInventoryGrid.appendChild(card);
+                }
             });
         }
+        
+        function sellItem(itemId, itemGrade, itemLevel) {
+            const invItem = gameState.inventory.find(i => i.id === itemId && i.grade === itemGrade && i.level === itemLevel);
+            if (!invItem) {
+                showStatusMessage('판매할 아이템을 찾을 수 없습니다.', 'red');
+                return;
+            }
+            const itemData = items.find(i => i.id === invItem.id);
+            if (!itemData) return;
+            const price = getSellPrice(invItem);
+            
+            showConfirmModal('아이템 판매', `정말로 ${itemData.name}${getGradeTag(invItem.grade)} Lv.${invItem.level} 아이템을 ${price.toLocaleString()} 코인에 판매하시겠습니까?`, () => {
+                // 확인 콜백 안에서 아이템을 다시 찾아 최신 상태 확인
+                const itemToSell = gameState.inventory.find(i => i.id === itemId && i.grade === itemGrade && i.level === itemLevel);
+                if (!itemToSell || itemToSell.count <= 0) {
+                    showStatusMessage('이미 판매되었거나 없는 아이템입니다.', 'red');
+                    updateUI(); // 불일치 시 UI 갱신
+                    return;
+                }
 
+                gameState.coins += price;
+                updateMissionProgress('coins_earned', price);
+                itemToSell.count--;
+                gameState.inventory = gameState.inventory.filter(item => item.count > 0);
+                updateUI();
+                saveGame();
+                showStatusMessage(`${itemData.name} 아이템을 ${price.toLocaleString()} 코인에 판매했습니다.`, 'green');
+            });
+        }
+        
         function renderMoneyMakingSlots() {
-            moneyMakingSlots.innerHTML = '';
+            moneyMakingSlotsContainer.innerHTML = '';
             gameState.moneyMaking.slots.forEach((item, index) => {
                 const slot = document.createElement('div');
-                slot.className = 'money-slot';
+                slot.classList.add('money-slot');
+                slot.dataset.slotIndex = index;
+                
                 if (item) {
-                    slot.innerHTML = `
-                        <div class="item-content">
-                            <span class="text-4xl block">${item.emoji}</span>
-                            <p class="text-xs mt-1 text-gray-400">${item.name} Lv.${item.level}</p>
-                            <p class="text-xs text-green-400">${calculateEPS(item).toLocaleString()} 코인/초</p>
-                        </div>
-                        <button class="remove-btn" data-index="${index}">&times;</button>
-                    `;
-                    slot.onclick = (e) => {
-                        if (e.target.classList.contains('remove-btn')) {
-                            removeItemFromSlot(index);
-                        }
-                    };
+                    const itemData = items.find(i => i.id === item.id);
+                    if (itemData) {
+                        slot.innerHTML = `
+                            <div class="item-content">
+                                <span class="text-4xl">${itemData.emoji}</span>
+                                <p class="text-sm font-bold truncate mt-1">${itemData.name}${getGradeTag(item.grade)}</p>
+                                <p class="text-xs text-gray-400">Lv.${item.level} | ${calculateEPS(item).toLocaleString()}/s</p>
+                            </div>
+                            <button class="remove-btn" data-slot-index="${index}">&times;</button>
+                        `;
+                        slot.classList.add('rarity-' + itemData.rarity, `item-grade-${item.grade}`);
+                        slot.querySelector('.remove-btn').addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            removeItemFromMoneyMaking(index);
+                        });
+                    }
                 } else {
                     slot.innerHTML = `<span class="plus-sign">+</span>`;
-                    slot.onclick = () => openItemSelectionModal(index);
+                    slot.addEventListener('click', () => {
+                        showItemSelectionModal(index);
+                    });
                 }
-                moneyMakingSlots.appendChild(slot);
+                moneyMakingSlotsContainer.appendChild(slot);
             });
-            updateTotalEPS();
         }
 
-        function openItemSelectionModal(slotIndex) {
+        function showItemSelectionModal(slotIndex) {
             itemSelectionGrid.innerHTML = '';
+            const sortedInventory = [...gameState.inventory].sort((a,b) => calculateEPS(b) - calculateEPS(a));
             
-            const placeableItems = gameState.inventory.filter(item => item.level >= 1 && item.count > 0);
-            
-            if (placeableItems.length === 0) {
-                itemSelectionGrid.innerHTML = '<p class="text-center text-gray-400 col-span-full">배치할 수 있는 아이템이 없습니다.</p>';
-                return;
-            }
-
-            placeableItems.forEach(item => {
+            sortedInventory.forEach(invItem => {
+                const itemData = items.find(i => i.id === invItem.id);
                 const card = document.createElement('div');
-                card.className = 'item-card';
+                card.className = `item-card rarity-${itemData.rarity} item-grade-${invItem.grade}`;
                 card.innerHTML = `
-                    <span class="text-4xl block">${item.emoji}</span>
-                    <p class="result-name mt-1">${item.name} Lv.${item.level}</p>
-                    <div class="absolute bottom-1 right-2 bg-gray-900 text-yellow-400 rounded-full px-2 py-1 text-xs font-bold">x${item.count}</div>
+                    <span class="text-4xl">${itemData.emoji}</span>
+                    <p class="text-sm font-bold truncate mt-2">${itemData.name}${getGradeTag(invItem.grade)}</p>
+                    <p class="text-xs text-gray-400">Lv.${invItem.level} | ${invItem.count}개</p>
+                    <p class="text-xs text-green-400">${calculateEPS(invItem).toLocaleString()}/s</p>
                 `;
-                card.onclick = () => selectItemForSlot(item, slotIndex);
+                card.addEventListener('click', () => {
+                    placeItemInMoneyMaking(slotIndex, invItem);
+                    hideModal(itemSelectionModal);
+                });
                 itemSelectionGrid.appendChild(card);
             });
             showModal(itemSelectionModal);
         }
 
-        function selectItemForSlot(item, slotIndex) {
-            const indexInInventory = gameState.inventory.findIndex(invItem => invItem.id === item.id && invItem.level === item.level);
-            
-            if (indexInInventory > -1) {
-                const itemToPlace = gameState.inventory[indexInInventory];
-                
-                // 해당 아이템이 이미 배치되어 있는지 확인
-                const alreadyPlaced = gameState.moneyMaking.slots.some(slotItem => 
-                    slotItem && slotItem.id === itemToPlace.id && slotItem.level === itemToPlace.level);
+        function placeItemInMoneyMaking(slotIndex, item) {
+            const invItem = gameState.inventory.find(i => i.id === item.id && i.grade === item.grade && i.level === item.level);
+            if (invItem && invItem.count > 0) {
 
-                if (alreadyPlaced) {
-                    showSystemMessage('경고', '이미 배치된 아이템입니다.');
-                    return;
-                }
+                removeItemFromMoneyMaking(slotIndex, false);
                 
-                // 인벤토리에서 아이템 수량 감소 또는 제거
-                if (itemToPlace.count > 1) {
-                    itemToPlace.count--;
+                gameState.moneyMaking.slots[slotIndex] = {id: invItem.id, grade: invItem.grade, level: invItem.level, count: 1};
+                invItem.count--;
+                if(invItem.count === 0) {
+                    gameState.inventory = gameState.inventory.filter(i => i !== invItem);
+                }
+                updateUI();
+                saveGame();
+            }
+        }
+
+        function removeItemFromMoneyMaking(slotIndex, doUpdate = true) {
+            const itemToReturn = gameState.moneyMaking.slots[slotIndex];
+            if (itemToReturn) {
+                const existingItem = gameState.inventory.find(i => i.id === itemToReturn.id && i.grade === itemToReturn.grade && i.level === itemToReturn.level);
+                if(existingItem) {
+                    existingItem.count++;
                 } else {
-                    gameState.inventory.splice(indexInInventory, 1);
+                    gameState.inventory.push(itemToReturn);
                 }
-
-                // 슬롯에 아이템 배치
-                gameState.moneyMaking.slots[slotIndex] = {...itemToPlace, count: 1};
-
-                hideModal(itemSelectionModal);
-                showSystemMessage('아이템 배치', `${itemToPlace.name}을 돈 벌기 슬롯에 배치했습니다.`);
-                updateUI();
-            }
-        }
-
-        function removeItemFromSlot(slotIndex) {
-            const item = gameState.moneyMaking.slots[slotIndex];
-            if (item) {
-                addItemToInventory(item);
                 gameState.moneyMaking.slots[slotIndex] = null;
-                showSystemMessage('아이템 회수', `${item.name}을 인벤토리로 되돌렸습니다.`);
-                updateUI();
+                if (doUpdate) {
+                    updateUI();
+                    saveGame();
+                }
             }
         }
 
-        function updateTotalEPS() {
-            let totalEps = 0;
+        function updateTotalEps() {
+            let currentEPS = 0;
             gameState.moneyMaking.slots.forEach(item => {
-                if (item) {
-                    totalEps += calculateEPS(item);
-                }
+                if (item) currentEPS += calculateEPS(item);
             });
-            totalEpsEl.textContent = totalEps.toLocaleString();
+            totalEpsEl.textContent = currentEPS.toLocaleString();
+        }
+
+        function collectAllCoins() {
+             const uncollected = Math.floor(gameState.moneyMaking.uncollected);
+             if (uncollected <= 0) {
+                 showStatusMessage('모을 코인이 없습니다.', 'red');
+                 return;
+             }
+             gameState.coins += uncollected;
+             gameState.moneyMaking.uncollected -= uncollected;
+             updateMissionProgress('uncollected_coins', uncollected);
+             updateMissionProgress('coins_earned', uncollected);
+             updateUI();
+             saveGame();
+             showStatusMessage(`${uncollected.toLocaleString()} 코인을 수집했습니다!`, 'green');
+        }
+
+        function checkCombineButton() {
+            const selectedItemCard = contentInventory.querySelector('.item-card.selected');
+            if(selectedItemCard){
+                const itemId = parseInt(selectedItemCard.dataset.itemId);
+                const itemGrade = selectedItemCard.dataset.itemGrade;
+                const itemLevel = parseInt(selectedItemCard.dataset.itemLevel);
+                const inventoryItem = gameState.inventory.find(i => i.id === itemId && i.grade === itemGrade && i.level === itemLevel);
+                combineButton.disabled = !(inventoryItem && inventoryItem.count >= 3 && itemLevel < 3);
+            } else {
+                combineButton.disabled = true;
+            }
         }
         
-        function collectAllCoins() {
-            const collected = Math.floor(gameState.moneyMaking.uncollected);
-            if (collected <= 0) {
-                showSystemMessage('알림', '쌓인 코인이 없습니다.');
-                return;
+        function renderMessages() {
+            messageList.innerHTML = '';
+            let unreadCount = 0;
+            const sortedMessages = [...gameState.messages].sort((a, b) => b.id - a.id);
+            sortedMessages.forEach(message => {
+                const item = document.createElement('div');
+                item.className = 'message-item p-4 cursor-pointer';
+                if (message.read) {
+                    item.classList.add('read');
+                } else {
+                    unreadCount++;
+                }
+                if (message.reward && !message.claimed) {
+                    item.innerHTML = `
+                        <div>
+                            <span class="font-bold text-yellow-400">${message.title}</span>
+                            <span class="text-xs text-green-400 block">보상 있음!</span>
+                        </div>
+                        <span class="text-xs text-gray-500">${new Date(message.id).toLocaleDateString()}</span>
+                    `;
+                } else {
+                     item.innerHTML = `
+                        <span class="font-bold">${message.title}</span>
+                        <span class="text-xs text-gray-500">${new Date(message.id).toLocaleDateString()}</span>
+                    `;
+                }
+                item.addEventListener('click', () => showMessageDetail(message));
+                messageList.appendChild(item);
+            });
+            const showDot = unreadCount > 0 && gameState.settings.notification;
+            messageNotificationDot.style.display = showDot ? 'block' : 'none';
+            messageSubtabDot.style.display = showDot ? 'block' : 'none';
+        }
+
+        function showMessageDetail(message) {
+             messageDetailTitle.textContent = message.title;
+             messageDetailContent.textContent = message.content;
+             messageDetailRewardSection.innerHTML = '';
+             
+             if (message.reward) {
+                 const rewardButton = document.createElement('button');
+                 rewardButton.className = 'interactable-button bg-green-600 mt-4';
+                 rewardButton.disabled = message.claimed;
+                 
+                 if (message.reward.type === 'coins') {
+                     rewardButton.textContent = message.claimed ? '보상 수령 완료' : `보상 받기 (${message.reward.amount.toLocaleString()} 코인)`;
+                 } else if (message.reward.type === 'clearKey') {
+                     rewardButton.textContent = message.claimed ? '열쇠 조각 획득 완료' : `클리어를 위한 열쇠 조각 - ${message.reward.key} 획득`;
+                 }
+
+                 rewardButton.addEventListener('click', () => {
+                     claimReward(message, rewardButton);
+                 });
+                 messageDetailRewardSection.appendChild(rewardButton);
+             }
+             
+             if (!message.read) {
+                message.read = true;
+                updateUI();
+                saveGame();
+             }
+             showModal(messageDetailModal);
+        }
+
+        function claimReward(message, button) {
+            if(message.claimed) return;
+            
+            message.claimed = true;
+            button.disabled = true;
+
+            if (message.reward.type === 'coins') {
+                gameState.coins += message.reward.amount;
+                updateMissionProgress('coins_earned', message.reward.amount);
+                button.textContent = '보상 수령 완료';
+                showStatusMessage(`${message.reward.amount.toLocaleString()} 코인을 획득했습니다!`, 'green');
+            } else if (message.reward.type === 'clearKey') {
+                gameState.clearProgress[`key${message.reward.key}`] = true;
+                button.textContent = `열쇠 조각 - ${message.reward.key} 획득 완료`;
+                showStatusMessage(`클리어를 위한 열쇠 조각 - ${message.reward.key} 획득!`, 'yellow');
+                checkGameClear();
             }
-            gameState.coins += collected;
-            gameState.moneyMaking.uncollected = 0;
-            showSystemMessage('코인 수집', `${collected.toLocaleString()} 코인을 수집했습니다!`);
+
+            updateUI();
+            saveGame();
+        }
+
+        function markAllMessagesRead() {
+            gameState.messages.forEach(message => message.read = true);
+            updateUI();
+            saveGame();
+        }
+
+        function updateMissionProgress(type, amount = 1) {
+            let missionCompleted = false;
+            if(type.startsWith('level3')) { 
+                const mission = ALL_MISSIONS.find(m => m.type === type);
+                if(mission && !gameState.missionProgress[mission.id].completed) {
+                    gameState.missionProgress[mission.id].progress = 1;
+                }
+            } else { 
+                ALL_MISSIONS.forEach(mission => {
+                    if (mission.type === type && !gameState.missionProgress[mission.id].completed) {
+                        gameState.missionProgress[mission.id].progress += amount;
+                    }
+                });
+            }
+
+            gameState.stats[`total_${type}`] = (gameState.stats[`total_${type}`] || 0) + amount;
+
+
+            ALL_MISSIONS.forEach(mission => {
+                const progressData = gameState.missionProgress[mission.id];
+                if (!progressData.completed && progressData.progress >= mission.target) {
+                    progressData.completed = true;
+                    missionCompleted = true;
+                    addMessage({
+                        title: `미션 완료: ${mission.title}`,
+                        content: `${mission.title} 미션을 완료했습니다! 메시지함에서 보상을 확인하세요.`,
+                        reward: { type: 'coins', amount: mission.reward }
+                    });
+                }
+            });
+            
+            if(missionCompleted) {
+                const completedCount = ALL_MISSIONS.filter(m => gameState.missionProgress[m.id].completed).length;
+                if (completedCount >= 100 && !gameState.clearProgress.key1) {
+                    addMessage({
+                        title: '위대한 여정의 끝',
+                        content: '100개의 미션을 모두 완료하셨습니다! 클리어에 한 발짝 다가갑니다.',
+                        reward: { type: 'clearKey', key: 1 }
+                    });
+                }
+                updateUI();
+                saveGame();
+            }
+        }
+        
+        function addMessage(msg) {
+            gameState.messages.push({
+                id: Date.now(),
+                read: false,
+                claimed: !msg.reward, 
+                ...msg
+            });
             updateUI();
         }
 
         function renderMissions() {
-            missionActiveContent.innerHTML = '';
-            missionCompletedContent.innerHTML = '';
+            missionContentActive.innerHTML = '';
+            missionContentCompleted.innerHTML = '';
             
-            gameState.missions.forEach(mission => {
-                const isCompleted = mission.completed;
-                const missionEl = document.createElement('div');
-                missionEl.className = 'mission-item flex items-center justify-between';
+            let activeCount = 0;
+            let completedCount = 0;
+
+            ALL_MISSIONS.forEach(mission => {
+                const progressData = gameState.missionProgress[mission.id];
+                if (!progressData) return;
+
+                const targetContainer = progressData.completed ? missionContentCompleted : missionContentActive;
+                if(progressData.completed) completedCount++; else activeCount++;
+
+                const item = document.createElement('div');
+                item.classList.add('mission-item');
                 
-                if (isCompleted) {
-                    missionEl.innerHTML = `
-                        <div>
-                            <p class="text-gray-400 line-through">${mission.name}</p>
-                            <p class="text-xs text-gray-500">보상: ${mission.reward.toLocaleString()} 코인</p>
+                if(progressData.completed) {
+                    item.innerHTML = `
+                        <div class="flex justify-between items-center">
+                            <span class="font-bold text-gray-500 line-through">${mission.title}</span>
+                            <span class="text-green-500 font-bold">완료</span>
                         </div>
-                        <span class="text-green-500">완료 ✅</span>
                     `;
-                    missionCompletedContent.appendChild(missionEl);
                 } else {
-                    const progress = getMissionProgress(mission.id);
-                    missionEl.innerHTML = `
-                        <div>
-                            <p>${mission.name}</p>
-                            <p class="text-sm text-yellow-400">진행도: ${progress}</p>
-                            <p class="text-xs text-gray-400">보상: ${mission.reward.toLocaleString()} 코인</p>
+                    const progress = progressData.progress || 0;
+                    const progressPercentage = Math.min(100, (progress / mission.target) * 100);
+                    item.innerHTML = `
+                        <div class="flex justify-between items-center mb-2">
+                            <span class="font-bold">${mission.title}</span>
+                            <span class="text-xs text-yellow-400">보상: ${mission.reward.toLocaleString()} 코인</span>
+                        </div>
+                        <div class="w-full bg-gray-700 rounded-full h-4 relative">
+                            <div class="bg-green-500 h-4 rounded-full" style="width: ${progressPercentage}%"></div>
+                            <span class="absolute w-full h-full top-0 left-0 text-center text-xs leading-4 text-white font-bold">${Math.floor(progress).toLocaleString()}/${mission.target.toLocaleString()}</span>
                         </div>
                     `;
-                    missionActiveContent.appendChild(missionEl);
                 }
+                targetContainer.appendChild(item);
             });
-            
-            if (missionActiveContent.innerHTML === '') {
-                missionActiveContent.innerHTML = '<p class="text-center text-gray-400">현재 진행중인 미션이 없습니다.</p>';
-            }
-            if (missionCompletedContent.innerHTML === '') {
-                missionCompletedContent.innerHTML = '<p class="text-center text-gray-400">완료한 미션이 없습니다.</p>';
-            }
-        }
-        
-        function getMissionProgress(missionId) {
-            const mission = gameState.missions.find(m => m.id === missionId);
-            if (!mission) return '0/0';
-            
-            switch (missionId) {
-                case 1: // 뽑기 10회
-                    return `${gameState.pulls} / 10`;
-                case 2: // 5종류의 아이템 수집
-                    const uniqueItems = Object.values(gameState.pokedex).filter(entry => entry.count > 0).length;
-                    return `${uniqueItems} / 5`;
-                case 3: // 코인 10,000개 획득
-                    return `${gameState.coins.toLocaleString()} / 10,000`;
-                case 4: // 아이템 5개 판매
-                    return `${gameState.totalItemsSold} / 5`;
-                case 5: // 골드 등급 아이템 획득
-                    const goldItemCount = Object.values(gameState.pokedex).filter(entry => entry.grade === '골드').length;
-                    return `${goldItemCount} / 1`;
-            }
-            return '0/0';
-        }
-        
-        function checkMissions() {
-            gameState.missions.forEach(mission => {
-                if (mission.completed) return;
-                
-                let isComplete = false;
-                switch (mission.id) {
-                    case 1: isComplete = gameState.pulls >= 10; break;
-                    case 2: isComplete = Object.values(gameState.pokedex).filter(entry => entry.count > 0).length >= 5; break;
-                    case 3: isComplete = gameState.coins >= 10000; break;
-                    case 4: isComplete = gameState.totalItemsSold >= 5; break;
-                    case 5: isComplete = Object.values(gameState.pokedex).some(entry => entry.grade === '골드'); break;
-                }
-                
-                if (isComplete) {
-                    mission.completed = true;
-                    gameState.coins += mission.reward;
-                    showSystemMessage('미션 완료!', `[${mission.name}] 미션을 완료하여 ${mission.reward.toLocaleString()} 코인을 획득했습니다!`);
-                }
-            });
-            saveGame();
-        }
 
-        function renderMessages() {
-            messageList.innerHTML = '';
-            if (gameState.messages.length === 0) {
-                messageList.innerHTML = '<p class="text-center text-gray-400 py-4">새로운 메시지가 없습니다.</p>';
-                return;
-            }
-            gameState.messages.forEach((msg, index) => {
-                const messageEl = document.createElement('div');
-                messageEl.className = `message-item ${msg.read ? 'read' : ''}`;
-                const date = new Date(msg.timestamp);
-                const dateString = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
-                messageEl.innerHTML = `
-                    <div class="flex-1">
-                        <p class="font-bold">${msg.title}</p>
-                        <p class="text-xs text-gray-500">${dateString}</p>
-                    </div>
-                    ${msg.read ? '' : '<span class="text-xs text-blue-400">새 메시지</span>'}
-                `;
-                messageEl.onclick = () => showMessageDetail(index);
-                messageList.appendChild(messageEl);
-            });
-        }
-        
-        function showMessageDetail(index) {
-            const message = gameState.messages[index];
-            messageDetailTitle.textContent = message.title;
-            messageDetailContent.textContent = message.content;
-            
-            if (message.reward) {
-                messageDetailRewardSection.innerHTML = `<p class="font-bold text-yellow-400 mt-4">보상: ${message.reward.toLocaleString()} 코인</p>`;
-            } else {
-                messageDetailRewardSection.innerHTML = '';
-            }
-            
-            if (!message.read) {
-                message.read = true;
-                showSystemMessage('메시지 읽음', `${message.title} 메시지를 확인했습니다.`);
-                updateMessageNotification();
-                saveGame();
-            }
-            
-            showModal(messageDetailModal);
-        }
-
-        function markAllMessagesRead() {
-            gameState.messages.forEach(msg => msg.read = true);
-            updateMessageNotification();
-            renderMessages();
-            saveGame();
-            showSystemMessage('메시지함', '모든 메시지를 읽었습니다.');
+            if (activeCount === 0) missionContentActive.innerHTML = '<p class="text-center text-gray-400">진행 중인 미션이 없습니다.</p>';
+            if (completedCount === 0) missionContentCompleted.innerHTML = '<p class="text-center text-gray-400">완료한 미션이 없습니다.</p>';
         }
 
         function updateSettingsUI() {
-            settingToggleCutsceneBtn.textContent = gameState.settings.cutscene ? '켜짐' : '꺼짐';
-            settingToggleCutsceneBtn.className = `interactable-button ${gameState.settings.cutscene ? 'bg-green-600' : 'bg-gray-600'}`;
-            settingToggleSoundBtn.textContent = gameState.settings.sound ? '켜짐' : '꺼짐';
-            settingToggleSoundBtn.className = `interactable-button ${gameState.settings.sound ? 'bg-green-600' : 'bg-gray-600'}`;
-            settingToggleNotificationBtn.textContent = gameState.settings.notification ? '켜짐' : '꺼짐';
-            settingToggleNotificationBtn.className = `interactable-button ${gameState.settings.notification ? 'bg-green-600' : 'bg-gray-600'}`;
+            settingToggleCutscene.textContent = gameState.settings.cutscene ? 'ON' : 'OFF';
+            settingToggleSound.textContent = gameState.settings.sound ? 'ON' : 'OFF';
+            settingToggleNotification.textContent = gameState.settings.notification ? 'ON' : 'OFF';
         }
         
-        function toggleSetting(setting) {
-            gameState.settings[setting] = !gameState.settings[setting];
-            updateSettingsUI();
-            saveGame();
-            showSystemMessage('설정 변경', `${setting} 설정이 ${gameState.settings[setting] ? '켜짐' : '꺼짐'}으로 변경되었습니다.`);
-        }
-        
-        function checkKiwiHuntCompletion() {
-            if (gameState.kiwiHunt.found.every(isFound => isFound) && !gameState.kiwiHunt.completed) {
-                showModal(clearModal);
-                playSound('clear');
-                gameState.kiwiHunt.completed = true;
+        function checkGameClear() {
+            if (gameState.gameCleared) return;
+            const { key1, key2, key3, key4, key5 } = gameState.clearProgress;
+            if (key1 && key2 && key3 && key4 && key5) {
+                gameState.gameCleared = true;
+                addMessage({
+                    title: '클리어를 축하드립니다!',
+                    content: '마침내 모든 열쇠 조각을 모아 게임을 클리어했습니다! 당신은 진정한 럭키 뽑기 머신의 마스터입니다!'
+                });
+                setTimeout(() => showModal(document.getElementById('clear-modal')), 1000);
                 saveGame();
             }
         }
         
-        function renderKiwiHuntEmojis() {
-            kiwiHuntEmojis.forEach(emoji => {
-                const id = emoji.dataset.huntId - 1;
-                if (gameState.kiwiHunt.found[id]) {
-                    emoji.classList.remove('hidden');
-                } else {
-                    emoji.classList.add('hidden');
+        function updateKiwiHuntEmojis() {
+            document.querySelectorAll('.kiwi-hunt-emoji').forEach(emoji => {
+                const location = emoji.dataset.huntLocation;
+                const isFound = gameState.kiwiHunt.found.includes(location);
+                let shouldShow = gameState.kiwiHunt.unlocked && !isFound;
+                
+
+                if (location === 'pokedex-secret' || location === 'pokedex-cup') {
+                    shouldShow = false; 
                 }
+
+                emoji.classList.toggle('hidden', !shouldShow);
             });
         }
         
-        // --- 6. UI 업데이트 및 이벤트 핸들러 ---
-        function updateUI() {
-            coinsElement.textContent = formatNumber(gameState.coins);
-            
-            renderInventory();
-            renderPokedex();
-            renderSellInventory();
-            renderMoneyMakingSlots();
-            renderMessages();
-            renderMissions();
-            updateSettingsUI();
-            updateMessageNotification();
-            checkMissions();
-            saveGame();
-        }
-
-        function setActiveTab(tabId) {
-            activeTab = tabId;
-            document.querySelectorAll('[id^="content-"]').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`content-${tabId}`).classList.remove('hidden');
-            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
-            document.getElementById(`tab-${tabId}`).classList.add('active');
-            
-            if (tabId === 'inventory') { renderInventory(); }
-            if (tabId === 'pokedex') { renderPokedex(); }
-            if (tabId === 'shop') { renderSellInventory(); }
-            if (tabId === 'money-making') { renderMoneyMakingSlots(); }
-            if (tabId === 'settings') { 
-                const subtab = document.querySelector('.sub-tab-button.active');
-                setActiveSettingsSubtab(subtab ? subtab.dataset.subtab : 'settings-main');
-                renderMissions();
-                renderMessages();
-            }
-        }
-        
-        function setActivePokedexGrade(grade) {
-            activePokedexGrade = grade;
-            pokedexGradeTabs.forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`.pokedex-grade-tab[data-grade="${grade}"]`).classList.add('active');
-            renderPokedex();
-        }
-
-        function setActiveShopTab(tabId) {
-            activeShopTab = tabId;
-            shopContentBuy.classList.toggle('hidden', tabId !== 'buy');
-            shopContentSell.classList.toggle('hidden', tabId !== 'sell');
-            shopTabBuy.classList.toggle('active', tabId === 'buy');
-            shopTabSell.classList.toggle('active', tabId === 'sell');
-            if (tabId === 'sell') {
-                renderSellInventory();
-            }
-        }
-
-        function setActiveSettingsSubtab(subtabId) {
-            activeSettingsSubtab = subtabId;
-            document.querySelectorAll('[id^="subtab-content-"]').forEach(el => el.classList.add('hidden'));
-            document.getElementById(`subtab-content-${subtabId}`).classList.remove('hidden');
-            document.querySelectorAll('.sub-tab-button').forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`.sub-tab-button[data-subtab="${subtabId}"]`).classList.add('active');
-        }
-        
-        function setActiveMissionTab(tabId) {
-            activeMissionTab = tabId;
-            missionActiveContent.classList.toggle('hidden', tabId !== 'active');
-            missionCompletedContent.classList.toggle('hidden', tabId !== 'completed');
-            missionTabs.forEach(btn => btn.classList.remove('active'));
-            document.querySelector(`.mission-tab[data-mission-tab="${tabId}"]`).classList.add('active');
-        }
-
-        // --- 이벤트 리스너 ---
-        pullButton.addEventListener('click', () => pullGacha(1));
-        pull10Button.addEventListener('click', () => pullGacha(10));
-        getCoinsButton.addEventListener('click', getDailyCoins);
-        tabInventoryBtn.addEventListener('click', () => setActiveTab('inventory'));
-        tabPokedexBtn.addEventListener('click', () => setActiveTab('pokedex'));
-        tabShopBtn.addEventListener('click', () => setActiveTab('shop'));
-        tabMoneyMakingBtn.addEventListener('click', () => setActiveTab('money-making'));
-        tabSettingsBtn.addEventListener('click', () => setActiveTab('settings'));
-        closePokedexModal.addEventListener('click', () => hideModal(pokedexInfoModal));
-        shopTabBuy.addEventListener('click', () => setActiveShopTab('buy'));
-        shopTabSell.addEventListener('click', () => setActiveShopTab('sell'));
-        buyLuckBuffBtn.addEventListener('click', buyLuckBuff);
-        collectAllBtn.addEventListener('click', collectAllCoins);
-        closeItemSelectionModal.addEventListener('click', () => hideModal(itemSelectionModal));
-        combineButton.addEventListener('click', combineItems);
-        
-        document.querySelectorAll('.pokedex-grade-tab').forEach(btn => {
-            btn.addEventListener('click', () => setActivePokedexGrade(btn.dataset.grade));
-        });
-        document.querySelectorAll('.sub-tab-button').forEach(btn => {
-            btn.addEventListener('click', () => setActiveSettingsSubtab(btn.dataset.subtab));
-        });
-        document.querySelectorAll('.mission-tab').forEach(btn => {
-            btn.addEventListener('click', () => setActiveMissionTab(btn.dataset.mission-tab));
-        });
-        closeMessageDetailModal.addEventListener('click', () => hideModal(messageDetailModal));
-        markAllReadBtn.addEventListener('click', markAllMessagesRead);
-        settingToggleCutsceneBtn.addEventListener('click', () => toggleSetting('cutscene'));
-        settingToggleSoundBtn.addEventListener('click', () => toggleSetting('sound'));
-        settingToggleNotificationBtn.addEventListener('click', () => toggleSetting('notification'));
-        comboMinigameStartButton.addEventListener('click', startComboMinigame);
-        closeComboModal.addEventListener('click', () => hideModal(comboMinigameModal));
-        secretCodeButton.addEventListener('click', () => showModal(codeInputModal));
-        closeCodeModal.addEventListener('click', () => hideModal(codeInputModal));
-        submitCodeButton.addEventListener('click', handleSecretCode);
-        adminPanelButton.addEventListener('click', () => showModal(adminPanelModal));
-        closeAdminPanelModal.addEventListener('click', () => hideModal(adminPanelModal));
-        getAllItemsBtn.addEventListener('click', getAdminAllItems);
-        get100MCoinsBtn.addEventListener('click', getAdmin100MCoins);
-        resetGameBtn.addEventListener('click', resetGame);
-        restartGameBtn.addEventListener('click', resetGame);
-        
-        kiwiHuntEmojis.forEach(emoji => {
-            emoji.addEventListener('click', (e) => {
-                const id = parseInt(e.target.dataset.huntId) - 1;
-                if (!gameState.kiwiHunt.found[id]) {
-                    gameState.kiwiHunt.found[id] = true;
-                    showSystemMessage('숨겨진 키위 찾기', `${id+1}번째 숨겨진 키위를 발견했습니다!`);
-                    e.target.classList.remove('hidden');
-                    saveGame();
-                    checkKiwiHuntCompletion();
+        function handleKiwiHuntClick(e) {
+            const emoji = e.target;
+            const location = emoji.dataset.huntLocation;
+            if (!gameState.kiwiHunt.found.includes(location)) {
+                gameState.kiwiHunt.found.push(location);
+                showStatusMessage(`비밀 키위를 찾았습니다! (${gameState.kiwiHunt.found.length}/5)`, 'yellow');
+                
+                if(gameState.kiwiHunt.found.length === 5) {
+                    addMessage({
+                        title: '키위 숭배',
+                        content: '세상의 모든 키위를 찾아냈습니다. 키위의 가호가 당신과 함께합니다.',
+                        reward: { type: 'clearKey', key: 2 }
+                    });
                 }
-            });
-        });
+                updateKiwiHuntEmojis();
+                saveGame();
+            }
+        }
 
-        // --- 미니게임 로직 ---
-        let comboGameTimer = 0;
-        let comboGameInterval = null;
-        let comboGameClicks = 0;
+
+        function showModal(modalElement) { modalElement.style.display = 'flex'; }
+        function hideModal(modalElement) { modalElement.style.display = 'none'; }
+
+        function showStatusMessage(message, color) {
+            const container = document.getElementById('gacha-screen');
+            const statusDiv = document.createElement('div');
+            statusDiv.textContent = message;
+            statusDiv.className = 'fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full text-white font-bold z-[10002]';
+            statusDiv.style.backdropFilter = 'blur(5px)';
+            statusDiv.style.animation = 'fadeIn 0.5s ease-out';
+            if (color === 'red') statusDiv.style.backgroundColor = 'rgba(239, 68, 68, 0.8)';
+            else if (color === 'yellow') statusDiv.style.backgroundColor = 'rgba(250, 204, 21, 0.8)';
+            else statusDiv.style.backgroundColor = 'rgba(34, 197, 94, 0.8)';
+            container.appendChild(statusDiv);
+            
+            setTimeout(() => {
+                statusDiv.style.animation = 'fadeOut 0.5s ease-in forwards';
+                setTimeout(() => statusDiv.remove(), 500);
+            }, 2500);
+        }
+
+        function showConfirmModal(title, text, onConfirm) {
+            confirmModalTitle.textContent = title;
+            confirmModalText.textContent = text;
         
+            const onYesClick = () => {
+                onConfirm();
+                hideModal(confirmModal);
+                confirmModalYes.removeEventListener('click', onYesClick);
+            };
+
+            const onNoClick = () => {
+                hideModal(confirmModal);
+                confirmModalYes.removeEventListener('click', onYesClick);
+            };
+
+            confirmModalYes.onclick = null;
+            confirmModalYes.addEventListener('click', onYesClick);
+
+            confirmModalNo.onclick = onNoClick;
+            showModal(confirmModal);
+        }
+
+        function playGachaAnimation(item) {
+            gachaResult.classList.remove('show');
+            resultEmoji.textContent = '';
+            resultText.textContent = '...';
+            
+            setTimeout(() => {
+                const itemData = items.find(i => i.id === item.id);
+                resultEmoji.textContent = itemData.emoji;
+                resultText.textContent = itemData.name + getGradeTag(item.grade);
+                resultText.className = `result-name rarity-${itemData.rarity} item-grade-${item.grade}`;
+                gachaResult.classList.add('show');
+                
+                particleContainer.innerHTML = '';
+                if (item.grade !== 'general') {
+                    for(let i = 0; i < 20; i++) {
+                        const p = document.createElement('div');
+                        p.className = `particle particle-${item.grade}`;
+                        p.style.left = `${Math.random() * 100}%`;
+                        p.style.top = `${Math.random() * 100}%`;
+                        particleContainer.appendChild(p);
+                    }
+                }
+                playSound('pull');
+            }, 500);
+        }
+        
+
+        function showCutscene(item) {
+             if (!gameState.settings.cutscene || !['legendary', 'mystic', 'transcendent', 'secret', 'og'].includes(item.rarity)) {
+                 playGachaAnimation(item);
+                 return;
+             }
+             const cutsceneRevealDuration = 5000;
+             const rarityEffects = {
+                 'transcendent': 'particle-effect-time',
+                 'og': 'particle-effect-light',
+                 'legendary': 'particle-effect-light',
+                 'secret': 'particle-effect-dark'
+             };
+
+             cutsceneOverlay.style.display = 'flex';
+             setTimeout(() => cutsceneOverlay.classList.add('active'), 10);
+             
+             cutsceneEmoji.textContent = item.emoji;
+             cutsceneName.textContent = item.name + getGradeTag(item.grade);
+             cutsceneRarity.textContent = item.rarity;
+             cutsceneRarity.className = `cutscene-rarity rarity-${item.rarity} item-grade-${item.grade}`;
+
+             cutsceneParticles.innerHTML = '';
+             if (rarityEffects[item.rarity]) {
+                 cutsceneParticles.className = 'cutscene-particles';
+                 cutsceneParticles.classList.add(rarityEffects[item.rarity]);
+                 generateCutsceneParticles(item.rarity);
+             }
+
+             setTimeout(() => {
+                 cutsceneOverlay.classList.remove('active');
+                 setTimeout(() => cutsceneOverlay.style.display = 'none', 500);
+                 playGachaAnimation(item);
+             }, cutsceneRevealDuration);
+        }
+
+        function generateCutsceneParticles(rarity) {
+             cutsceneParticles.innerHTML = '';
+             const particleCount = 20;
+             for (let i = 0; i < particleCount; i++) {
+                 const particle = document.createElement('div');
+                 if (rarity === 'og' || rarity === 'legendary') {
+                      particle.classList.add('sparkle');
+                      const x = (Math.random() - 0.5) * 600 + 'px';
+                      const y = (Math.random() - 0.5) * 600 + 'px';
+                      particle.style.setProperty('--x', x);
+                      particle.style.setProperty('--y', y);
+                      particle.style.left = '50%';
+                      particle.style.top = '50%';
+                 } else if (rarity === 'secret') {
+                      particle.classList.add('tendril');
+                      const rotationStart = Math.random() * 360;
+                      const rotationEnd = rotationStart + (Math.random() * 180 - 90);
+                      particle.style.setProperty('--r-start', `${rotationStart}deg`);
+                      particle.style.setProperty('--r-end', `${rotationEnd}deg`);
+                      particle.style.left = '50%';
+                      particle.style.bottom = '50%';
+                 } else if (rarity === 'transcendent') {
+                     particle.classList.add('sand');
+                     const xStart = (Math.random() - 0.5) * 400 + 'px';
+                     const xEnd = (Math.random() - 0.5) * 400 + 'px';
+                     particle.style.setProperty('--x-start', xStart);
+                     particle.style.setProperty('--x-end', xEnd);
+                 }
+                 cutsceneParticles.appendChild(particle);
+             }
+        }
+
+        function playSound(type) {
+            if (!gameState.settings.sound || !audioCtx) return;
+            let frequency = 440, duration = 0.1, waveType = 'sine', gain = 0.3;
+            if (type === 'pull') { frequency = 880; duration = 0.2; waveType = 'triangle'; }
+            if (type === 'coin') { frequency = 1200; duration = 0.05; waveType = 'square'; }
+            if (type === 'combine') { frequency = 600; duration = 0.3; waveType = 'sawtooth'; }
+            
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
+            oscillator.connect(gainNode);
+            gainNode.connect(audioCtx.destination);
+            oscillator.type = waveType;
+            oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+            gainNode.gain.setValueAtTime(gain, audioCtx.currentTime);
+            gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration);
+            oscillator.start(audioCtx.currentTime);
+            oscillator.stop(audioCtx.currentTime + duration);
+        }
+
+        let comboClicks = 0, comboTimer, countdownInterval;
+
+        function resetComboMinigame() {
+            clearInterval(countdownInterval);
+            clearInterval(comboTimer);
+            comboClickButton.disabled = true;
+            comboClickButton.textContent = '준비...';
+            comboResultElement.textContent = '';
+        }
+
         function startComboMinigame() {
-            comboGameTimer = 5;
-            comboGameClicks = 0;
-            comboTimerEl.textContent = comboGameTimer;
-            comboClicksEl.textContent = comboGameClicks;
-            comboResultEl.textContent = '3초 후 시작!';
-            comboClickButton.disabled = true;
-            showModal(comboMinigameModal);
-            
-            let countdown = 3;
-            const countdownInterval = setInterval(() => {
-                countdown--;
-                if (countdown > 0) {
-                    comboResultEl.textContent = `${countdown}초 후 시작!`;
-                } else {
-                    clearInterval(countdownInterval);
-                    comboResultEl.textContent = '시작!';
-                    comboClickButton.disabled = false;
-                    comboClickButton.textContent = '클릭!';
-                    startComboTimer();
-                }
-            }, 1000);
-        }
+             resetComboMinigame();
+             comboClicks = 0;
+             comboClicksElement.textContent = 0;
+             comboTimerElement.textContent = 5;
+             
+             let countdown = 3;
+             comboClickButton.textContent = countdown;
 
-        function startComboTimer() {
-            comboGameInterval = setInterval(() => {
-                comboGameTimer--;
-                comboTimerEl.textContent = comboGameTimer;
-                if (comboGameTimer <= 0) {
-                    endComboMinigame();
-                }
-            }, 1000);
+             countdownInterval = setInterval(() => {
+                 countdown--;
+                 comboClickButton.textContent = countdown > 0 ? countdown : '시작!';
+                 if (countdown <= 0) {
+                     clearInterval(countdownInterval);
+                     comboClickButton.textContent = '클릭!';
+                     comboClickButton.disabled = false;
+                     
+                     let timeLeft = 5;
+                     comboTimer = setInterval(() => {
+                         timeLeft--;
+                         comboTimerElement.textContent = timeLeft;
+                         if (timeLeft <= 0) {
+                              endComboMinigame();
+                         }
+                     }, 1000);
+                 }
+             }, 1000);
         }
-
+        
         function endComboMinigame() {
-            clearInterval(comboGameInterval);
-            comboClickButton.disabled = true;
-            comboClickButton.textContent = '끝!';
+             resetComboMinigame();
+             comboClickButton.disabled = true;
+             const earnings = comboClicks * comboClicks;
+             comboResultElement.textContent = `총 ${comboClicks}번 클릭! ${earnings.toLocaleString()} 코인을 획득했습니다!`;
+             gameState.coins += earnings;
+             updateMissionProgress('coins_earned', earnings);
+             if(comboClicks > (gameState.stats.minigame_highscore || 0)) {
+                gameState.stats.minigame_highscore = comboClicks;
+                updateMissionProgress('minigame_score', comboClicks);
+             }
+             updateUI();
+             saveGame();
+        }
+
+
+        function setupEventListeners() {
+            pullButton.addEventListener('click', () => pull(1));
+            pull10Button.addEventListener('click', () => pull(10));
+            getCoinsButton.addEventListener('click', () => {
+                gameState.coins += 10;
+                updateMissionProgress('coins_earned', 10);
+                updateUI();
+                showStatusMessage('10 코인을 획득했습니다!', 'green');
+                playSound('coin');
+            });
             
-            let reward = 0;
-            if (comboGameClicks >= 50) {
-                reward = 50000;
-                comboResultEl.textContent = `대단해요! ${comboGameClicks}번 클릭! 보상: ${reward.toLocaleString()} 코인!`;
-            } else if (comboGameClicks >= 20) {
-                reward = 10000;
-                comboResultEl.textContent = `잘했어요! ${comboGameClicks}번 클릭! 보상: ${reward.toLocaleString()} 코인!`;
-            } else {
-                reward = 1000;
-                comboResultEl.textContent = `수고했어요! ${comboGameClicks}번 클릭! 보상: ${reward.toLocaleString()} 코인!`;
-            }
-            gameState.coins += reward;
-            showSystemMessage('미니게임 보상', `${comboGameClicks}회 연타 성공! ${reward.toLocaleString()} 코인을 획득했습니다.`);
-            updateUI();
-        }
-
-        comboClickButton.addEventListener('click', () => {
-            if (comboGameTimer > 0) {
-                comboGameClicks++;
-                comboClicksEl.textContent = comboGameClicks;
-            }
-        });
-
-        // --- 관리자/비밀 코드 ---
-        function handleSecretCode() {
-            const code = secretCodeInput.value.trim().toUpperCase();
-            if (secretCodes[code]) {
-                secretCodes[code]();
-            } else {
-                codeMessageEl.textContent = '유효하지 않은 코드입니다.';
-                codeMessageEl.style.color = 'red';
-            }
-        }
-
-        function getAdminAllItems() {
-            Object.keys(itemData).forEach(itemId => {
-                const item = {...itemData[itemId], level: 1};
-                addItemToInventory(item);
+            const tabs = {
+                'tab-inventory': contentInventory, 'tab-pokedex': contentPokedex, 'tab-shop': contentShop,
+                'tab-money-making': contentMoneyMaking, 'tab-settings': contentSettings
+            };
+            Object.keys(tabs).forEach(tabId => {
+                document.getElementById(tabId).addEventListener('click', (e) => {
+                    document.querySelector('.tab-button.active').classList.remove('active');
+                    e.currentTarget.classList.add('active');
+                    Object.values(tabs).forEach(content => content.classList.add('hidden'));
+                    tabs[tabId].classList.remove('hidden');
+                });
             });
-            showSystemMessage('관리자', '모든 아이템을 획득했습니다.');
-            updateUI();
-        }
 
-        function getAdmin100MCoins() {
-            gameState.coins += 100000000;
-            showSystemMessage('관리자', '1억 코인을 획득했습니다.');
-            updateUI();
+            [shopTabBuy, shopTabSell].forEach(tab => {
+                tab.addEventListener('click', () => {
+                    shopTabBuy.classList.toggle('active', tab === shopTabBuy);
+                    shopTabSell.classList.toggle('active', tab === shopTabSell);
+                    shopContentBuy.classList.toggle('hidden', tab !== shopTabBuy);
+                    shopContentSell.classList.toggle('hidden', tab !== shopTabSell);
+                });
+            });
+
+            subTabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    document.querySelector('#content-settings .sub-tab-button.active').classList.remove('active');
+                    e.currentTarget.classList.add('active');
+                    const subtabName = e.currentTarget.dataset.subtab;
+                    Object.values(subtabContents).forEach(content => content.classList.add('hidden'));
+                    subtabContents[subtabName]?.classList.remove('hidden');
+                });
+            });
+
+            pokedexGradeTabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    document.querySelector('.pokedex-grade-tab.active')?.classList.remove('active');
+                    e.currentTarget.classList.add('active');
+                    renderPokedex();
+                });
+            });
+            
+            missionTabs.forEach(tab => {
+                tab.addEventListener('click', (e) => {
+                    document.querySelector('.mission-tab.active')?.classList.remove('active');
+                    e.currentTarget.classList.add('active');
+                    const isCompletedTab = e.currentTarget.dataset.missionTab === 'completed';
+                    missionContentActive.classList.toggle('hidden', isCompletedTab);
+                    missionContentCompleted.classList.toggle('hidden', !isCompletedTab);
+                });
+            });
+
+            buyLuckBuffBtn.addEventListener('click', () => {
+                const cost = 10000000;
+                if (gameState.coins >= cost) {
+                    showConfirmModal('행운 4배 버프 구매', `10,000,000 코인을 지불하고 행운 4배 버프를 구매하시겠습니까? (30분)`, () => {
+                        gameState.coins -= cost;
+                        gameState.luckBuff.isActive = true;
+                        gameState.luckBuff.endTime = Date.now() + (30 * 60 * 1000);
+                        updateUI();
+                        saveGame();
+                        showStatusMessage('행운 4배 버프가 활성화되었습니다!', 'green');
+                    });
+                } else {
+                    showStatusMessage('코인이 부족합니다.', 'red');
+                }
+            });
+            
+            collectAllBtn.addEventListener('click', collectAllCoins);
+            combineButton.addEventListener('click', combineItems);
+            
+
+            [closePokedexModal, closeItemSelectionModal, closeMessageDetailModal, closeCodeModal, closeAdminPanelModal].forEach(btn => {
+                btn.addEventListener('click', () => hideModal(btn.closest('.modal')));
+            });
+
+            closeComboModal.addEventListener('click', () => {
+                resetComboMinigame();
+                hideModal(comboMinigameModal);
+            });
+
+            markAllReadBtn.addEventListener('click', markAllMessagesRead);
+            
+
+            comboMinigameStartButton.addEventListener('click', () => {
+                showModal(comboMinigameModal);
+                startComboMinigame();
+            });
+            
+            comboClickButton.addEventListener('click', () => {
+                if (comboClickButton.disabled) return;
+                comboClicks++;
+                comboClicksElement.textContent = comboClicks;
+            });
+
+            secretCodeButton.addEventListener('click', () => showModal(codeInputModal));
+            submitCodeButton.addEventListener('click', () => {
+                const code = secretCodeInput.value.toLowerCase().trim();
+                codeMessage.textContent = '';
+                if (code === '양~두~영~이kiwi') {
+                    gameState.adminEnabled = true;
+                    codeMessage.textContent = '관리자 패널이 활성화되었습니다!';
+                    updateUI();
+                    saveGame();
+                } else {
+                    codeMessage.textContent = '잘못된 코드입니다.';
+                }
+            });
+            
+
+            adminPanelButton.addEventListener('click', () => showModal(adminPanelModal));
+            getAllItemsBtn.addEventListener('click', () => {
+                gachaPool.forEach(item => addItemToInventory(item));
+                updateUI(); saveGame();
+            });
+            get100mCoinsBtn.addEventListener('click', () => {
+                gameState.coins += 100000000;
+                updateUI(); saveGame();
+            });
+            completeAllMissionsBtn.addEventListener('click', () => {
+                ALL_MISSIONS.forEach(m => gameState.missionProgress[m.id].progress = m.target);
+                updateMissionProgress('pulls', 0); 
+            });
+            getClearKeysBtn.addEventListener('click', () => {
+                Object.keys(gameState.clearProgress).forEach(k => gameState.clearProgress[k] = true);
+                checkGameClear();
+            });
+            resetGameBtn.addEventListener('click', () => {
+                showConfirmModal('게임 초기화', '모든 진행 상황이 사라집니다!', () => {
+                    localStorage.removeItem('luckyGachaGameFixed');
+                    location.reload();
+                });
+            });
+
+
+            settingToggleCutscene.addEventListener('click', () => { gameState.settings.cutscene = !gameState.settings.cutscene; updateUI(); saveGame(); });
+            settingToggleSound.addEventListener('click', () => { gameState.settings.sound = !gameState.settings.sound; updateUI(); saveGame(); });
+            settingToggleNotification.addEventListener('click', () => { gameState.settings.notification = !gameState.settings.notification; updateUI(); saveGame(); });
+
+
+            sellInventoryGrid.addEventListener('click', (e) => {
+                if (e.target.classList.contains('sell-btn')) {
+                    const button = e.target;
+                    const itemId = parseInt(button.dataset.itemId);
+                    const itemLevel = parseInt(button.dataset.itemLevel);
+                    const itemGrade = button.dataset.itemGrade;
+                    sellItem(itemId, itemGrade, itemLevel);
+                }
+            });
+            
+            document.querySelectorAll('.kiwi-hunt-emoji').forEach(emoji => {
+                emoji.addEventListener('click', handleKiwiHuntClick);
+            });
         }
         
-        function resetGame() {
-            showConfirmModal('게임 초기화', '정말로 게임 진행 상황을 초기화하시겠습니까? (되돌릴 수 없습니다)', () => {
-                localStorage.removeItem('luckyGachaGameState');
-                window.location.reload();
-            });
-        }
-        
-        // --- 게임 루프 ---
-        let lastUpdateTime = Date.now();
+
         
         function gameLoop() {
             const now = Date.now();
-            const deltaTime = (now - lastUpdateTime) / 1000; // 초 단위 시간 경과
-            lastUpdateTime = now;
 
-            let currentEPS = 0;
-            if(gameState.moneyMaking && gameState.moneyMaking.slots) {
-                gameState.moneyMaking.slots.forEach(item => { if (item) currentEPS += calculateEPS(item); });
+
+            if(gameState.coins >= 1000000000000000 && !gameState.clearProgress.key4) {
+                 addMessage({
+                    title: '최고 부자~!',
+                    content: '마침내 1경원을 모으는 위업을 달성했습니다!',
+                    reward: { type: 'clearKey', key: 4 }
+                });
             }
 
-            if (currentEPS > 0) {
-                const earned = currentEPS * deltaTime;
-                gameState.moneyMaking.uncollected += earned;
-                // UI 업데이트는 너무 자주 하지 않도록 조절
-                uncollectedCoinsEl.textContent = Math.floor(gameState.moneyMaking.uncollected).toLocaleString();
+
+            if (gameState.luckBuff.isActive) {
+                const timeLeft = gameState.luckBuff.endTime - now;
+                if (timeLeft <= 0) {
+                    gameState.luckBuff.isActive = false;
+                    luckBuffDisplay.classList.add('hidden');
+                } else {
+                    const minutes = Math.floor(timeLeft / 60000);
+                    const seconds = Math.floor((timeLeft % 60000) / 1000);
+                    luckBuffTimer.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+                    luckBuffDisplay.classList.remove('hidden');
+                }
+            } else {
+                luckBuffDisplay.classList.add('hidden');
             }
 
-            updateLuckBuffTimer();
             requestAnimationFrame(gameLoop);
         }
 
-        // 1초마다 게임 저장
-        setInterval(() => {
-            saveGame();
-        }, 1000);
+
+        function startMoneyMakingInterval() {
+            setInterval(() => {
+                let currentEPS = 0;
+                gameState.moneyMaking.slots.forEach(item => {
+                    if (item) currentEPS += calculateEPS(item);
+                });
+
+                if (currentEPS > 0) {
+                    gameState.moneyMaking.uncollected += currentEPS;
+                    uncollectedCoinsEl.textContent = Math.floor(gameState.moneyMaking.uncollected).toLocaleString();
+                }
+            }, 1000);
+        }
+
+        setInterval(saveGame, 5000); 
 
         window.onload = () => {
+            createGachaPool();
             loadGame();
+            setupEventListeners();
             updateUI();
             requestAnimationFrame(gameLoop);
+            startMoneyMakingInterval(); 
+            
+            document.body.addEventListener('click', () => {
+                if (!audioCtx) {
+                    try {
+                        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    } catch(e) { console.error("Web Audio API is not supported"); }
+                }
+            }, { once: true });
         };
-
-        document.body.addEventListener('click', () => {
-            if (!audioCtx) {
-                try {
-                    audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                } catch(e) { console.error("Web Audio API is not supported in this browser"); }
-            }
-        }, { once: true });
     </script>
 </body>
 </html>
+
+
