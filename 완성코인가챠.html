@@ -22,6 +22,40 @@
             overflow-y: auto;
         }
         .container { max-width: 900px; width: 100%; background-color: #111827; border-radius: 1.5rem; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); padding: 2rem; position: relative; }
+
+        #marquee-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 1000px;
+            height: 100px;
+            background: rgba(0, 0, 0, 0.7);
+            border: 5px solid #fff;
+            box-shadow: 0 0 30px #00ff00, inset 0 0 15px #00ff00;
+            display: none; /* Initially hidden */
+            align-items: center;
+            overflow: hidden;
+            white-space: pre; /* Preserves line breaks */
+            z-index: 10002;
+            padding: 0 1rem;
+        }
+
+        #marquee-text {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 2.5rem;
+            font-weight: bold;
+            color: #00ff00;
+            text-shadow: 0 0 10px #00ff00;
+            will-change: transform;
+            animation: marquee 30s linear infinite;
+        }
+
+        @keyframes marquee {
+            from { transform: translateX(100%); }
+            to { transform: translateX(-100%); }
+        }
         
         /* Gacha machine and display styling */
         .gacha-machine { background-color: #1f2937; border-radius: 1rem; padding: 2rem; position: relative; box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.3); border: 2px solid #4b5563; }
@@ -29,7 +63,10 @@
         .gacha-result { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.5s ease; background-color: rgba(0, 0, 0, 0.7); padding: 1rem; text-align: center; pointer-events: none; }
         .gacha-result.show { opacity: 1; pointer-events: auto; }
         .result-name { font-size: 1.5rem; font-weight: bold; margin-top: 0.5rem; }
-
+        .item-grade-gold { text-shadow: 0 0 5px #ffd700, 0 0 10px #ffd700; color: #fef08a; }
+        .item-grade-diamond { text-shadow: 0 0 5px #00ffff, 0 0 10px #00ffff; color: #7dd3fc; }
+        .item-grade-rainbow { animation: rainbow-text 2s linear infinite; }
+        
         /* Rarity and grade text styling with animations */
         .rarity-general { color: #9ca3af; } .rarity-rare { color: #16a34a; } .rarity-lesser-rare { color: #2563eb; } .rarity-legendary { color: #facc15; } .rarity-mystic { color: #9333ea; }
         .rarity-transcendent { background: linear-gradient(90deg, #f97316, #fde047, #f97316); background-clip: text; -webkit-background-clip: text; color: transparent; animation: transcendent-shine 3s linear infinite; }
@@ -88,16 +125,20 @@
         .money-slot { background-color: #1f2937; border: 2px dashed #4b5563; border-radius: 0.5rem; height: 120px; display: flex; justify-content: center; align-items: center; cursor: pointer; transition: all 0.2s; position: relative; }
         .money-slot:hover { border-color: #60a5fa; background-color: #374151; }
         .money-slot .remove-btn { position: absolute; top: -10px; right: -10px; background-color: #ef4444; color: white; border-radius: 50%; width: 24px; height: 24px; display: flex; justify-content: center; align-items: center; font-weight: bold; border: 2px solid #111827; }
-        /* BUG FIX: Added pointer-events: auto to make the kiwi clickable inside containers that might disable it. */
         .kiwi-hunt-emoji { cursor: pointer; transition: transform 0.2s; display: inline-block; pointer-events: auto; }
         .kiwi-hunt-emoji:hover { transform: scale(1.5) rotate(15deg); }
 
         /* Kunai minigame styling */
-        #kunai-game-area .kunai-launcher { position: absolute; bottom: 10px; left: 50%; font-size: 2.5rem; transform: translateX(-50%); }
-        #kunai-game-area .kunai-projectile { position: absolute; font-size: 2.5rem; pointer-events: none; will-change: transform; }
+        #kunai-game-area .kunai-launcher { position: absolute; bottom: 10px; right: 10px; font-size: 2.5rem; }
+        #kunai-game-area .kunai-projectile { position: absolute; font-size: 2.5rem; pointer-events: none; will-change: transform; width: 40px; height: 40px; line-height: 40px; text-align: center; }
         #kunai-game-area .target { position: absolute; font-size: 2.5rem; width: 40px; height: 40px; line-height: 40px; text-align: center; will-change: transform; pointer-events: none; }
         #kunai-game-area .hit { animation: target-hit 0.3s forwards; }
         @keyframes target-hit { 0% { transform: scale(1) rotate(0deg); opacity: 1; } 100% { transform: scale(2.5) rotate(180deg); opacity: 0; } }
+        
+        .setting-item { display: flex; justify-content: space-between; align-items: center; padding: 1rem 0; }
+        .message-item { display: flex; justify-content: space-between; align-items: center; }
+        .message-item.read { color: #6b7280; }
+        .mission-item { background-color: #1f2937; padding: 1rem; border-radius: 0.5rem; margin-bottom: 0.5rem; }
     </style>
 </head>
 <body class="selection:bg-yellow-300 selection:text-yellow-900">
@@ -327,7 +368,6 @@
             <div class="space-y-4">
                 <button id="get-all-items-btn" class="interactable-button w-full bg-red-600">모든 아이템 얻기</button>
                 <button id="get-100m-coins-btn" class="interactable-button w-full bg-green-600">코인 1억개 얻기</button>
-                <!-- NEW FEATURE: 1 Quadrillion Coins Button -->
                 <button id="get-1q-coins-btn" class="interactable-button w-full bg-yellow-500">코인 1경개 얻기</button>
                 <button id="complete-all-missions-btn" class="interactable-button w-full bg-blue-600">모든 미션 클리어</button>
                 <button id="get-clear-keys-btn" class="interactable-button w-full bg-yellow-600">모든 열쇠 조각 얻기</button>
@@ -353,6 +393,9 @@
             <h2 id="cutscene-name" class="cutscene-name"></h2>
             <p id="cutscene-rarity" class="cutscene-rarity"></p>
         </div>
+    </div>
+    <div id="marquee-container">
+        <span id="marquee-text"></span>
     </div>
     <div id="kunai-minigame-modal-container" class="modal">
         <div class="modal-content" style="max-width: 600px; background-color: #0c0a09;">
@@ -421,6 +464,8 @@
         const luckBuffTimer = document.getElementById('luck-buff-timer');
         const moneyMakingSlotsContainer = document.getElementById('money-making-slots');
         const uncollectedCoinsEl = document.getElementById('uncollected-coins');
+        const marqueeContainer = document.getElementById('marquee-container');
+        const marqueeText = document.getElementById('marquee-text');
         const totalEpsEl = document.getElementById('total-eps');
         const collectAllBtn = document.getElementById('collect-all-btn');
         const itemSelectionModal = document.getElementById('item-selection-modal');
@@ -446,7 +491,7 @@
         const closeAdminPanelModal = document.getElementById('close-admin-panel-modal');
         const getAllItemsBtn = document.getElementById('get-all-items-btn');
         const get100mCoinsBtn = document.getElementById('get-100m-coins-btn');
-        const get1QCoinsBtn = document.getElementById('get-1q-coins-btn'); // New button
+        const get1QCoinsBtn = document.getElementById('get-1q-coins-btn'); 
         const resetGameBtn = document.getElementById('resetAndClearGame');
         const completeAllMissionsBtn = document.getElementById('complete-all-missions-btn');
         const getClearKeysBtn = document.getElementById('get-clear-keys-btn');
@@ -554,13 +599,82 @@
             } else { resetGame(); }
         }
         function resetGame() { gameState = JSON.parse(JSON.stringify(initialState)); ALL_MISSIONS.forEach(mission => { gameState.missionProgress[mission.id] = { progress: 0, completed: false }; }); saveGame(); }
-        
+
+      function showGameClearMarquee() {
+            const truths = [
+                "클리어를 축하드립니다!",
+                "세상의 진실을 획득하였습니다.",
+                "관리자권한 코드: 양~두~영~이kiwi",
+                "지상이는 kiwi를 찢어!!!!!!!!",
+                "양의 신인 양두영이(양두마리)~ 가 스페셜 게스트입니당 ^^",
+                "학교 미디어 센터 비번: 2282",
+                "학교 1-8반 최강자: 윤*애",
+                "1-8반 깡패: 정지상",
+                "해킹 배우고 싶은 사람은 키위새한테 \"1203kiwihacker\"라고 말하면 해킹 강의 해드림~~~"
+            ];
+
+            const fullTruth = truths.join(" / ");
+            marqueeText.textContent = fullTruth;
+            
+            marqueeContainer.style.display = 'flex';
+            marqueeText.style.animationPlayState = 'running';
+
+            setTimeout(() => {
+                marqueeContainer.style.display = 'none';
+                marqueeText.style.animationPlayState = 'paused';
+            }, 30000);
+        }        
         // --- 4. Game Logic ---
         function createGachaPool() { gachaPool = []; items.forEach(item => { const itemRarityChance = RARITY_SETTINGS[item.rarity].chance; Object.keys(GRADE_SETTINGS).forEach(grade => { const gradeDivider = GRADE_SETTINGS[grade].chanceDivider; const finalChance = itemRarityChance / gradeDivider; gachaPool.push({ ...item, grade: grade, chance: finalChance, }); }); }); }
         function getWeightedRandomItem() { const luckFactor = gameState.luckBuff.isActive ? 4 : 1; const adjustedPool = gachaPool.map(item => { let adjustedChance = item.chance; if (luckFactor > 1) { if(item.rarity !== 'general') adjustedChance *= luckFactor; if(item.grade !== 'general') adjustedChance *= luckFactor; } return { ...item, adjustedChance: adjustedChance }; }); const totalWeight = adjustedPool.reduce((sum, item) => sum + item.adjustedChance, 0); let random = Math.random() * totalWeight; for (const item of adjustedPool) { if (random < item.adjustedChance) { return { ...item, level: 1 }; } random -= item.adjustedChance; } }
-        async function pull(count = 1) { const isTenPull = count > 1; const cost = isTenPull ? 1000 : 100; const pullCount = isTenPull ? 11 : 1; if (gameState.coins < cost) { showStatusMessage('코인이 부족합니다!', 'red'); return; } pullButton.disabled = true; pull10Button.disabled = true; gameState.coins -= cost; const pulledItems = []; for (let i = 0; i < pullCount; i++) { const item = getWeightedRandomItem(); pulledItems.push(item); addItemToInventory(item); } updateMissionProgress('pulls', pullCount); if (!isTenPull) { showCutscene(pulledItems[0], () => { pullButton.disabled = false; pull10Button.disabled = false; }); } else { const rarityOrder = ['general', 'rare', 'lesser-rare', 'legendary', 'mystic', 'transcendent', 'god', 'secret', 'og']; const minRarityIndex = rarityOrder.indexOf(gameState.settings.cutsceneMinRarity); const itemsForCutscene = gameState.settings.cutsceneOnMultiPull ? pulledItems.filter(item => rarityOrder.indexOf(item.rarity) >= minRarityIndex) : []; if (itemsForCutscene.length > 0) { for (const item of itemsForCutscene) { await new Promise(resolve => showCutscene(item, resolve)); } showStatusMessage(`${pullCount}개의 아이템 중 ${itemsForCutscene.length}개의 컷씬을 모두 재생했습니다!`, 'green'); } else { showStatusMessage(`${pullCount}개의 아이템을 뽑았습니다!`, 'green'); pulledItems.sort((a, b) => rarityOrder.indexOf(b.rarity) - rarityOrder.indexOf(a.rarity)); playGachaAnimation(pulledItems[0]); } pullButton.disabled = false; pull10Button.disabled = false; } updateUI(); saveGame(); }
         
-        // BUG FIX: Reordered logic to ensure special item triggers fire reliably.
+        async function pull(count = 1) {
+            const isTenPull = count > 1;
+            const cost = isTenPull ? 1000 : 100;
+            const pullCount = isTenPull ? 11 : 1;
+            if (gameState.coins < cost) {
+                showStatusMessage('코인이 부족합니다!', 'red');
+                return;
+            }
+            pullButton.disabled = true;
+            pull10Button.disabled = true;
+            gameState.coins -= cost;
+            const pulledItems = [];
+            for (let i = 0; i < pullCount; i++) {
+                const item = getWeightedRandomItem();
+                pulledItems.push(item);
+                addItemToInventory(item);
+            }
+            updateMissionProgress('pulls', pullCount);
+            
+            // BUG FIX: Save game state immediately after receiving items, before showing cutscenes.
+            updateUI();
+            saveGame();
+
+            if (!isTenPull) {
+                showCutscene(pulledItems[0], () => {
+                    pullButton.disabled = false;
+                    pull10Button.disabled = false;
+                });
+            } else {
+                const rarityOrder = ['general', 'rare', 'lesser-rare', 'legendary', 'mystic', 'transcendent', 'god', 'secret', 'og'];
+                const minRarityIndex = rarityOrder.indexOf(gameState.settings.cutsceneMinRarity);
+                const itemsForCutscene = gameState.settings.cutsceneOnMultiPull ? pulledItems.filter(item => rarityOrder.indexOf(item.rarity) >= minRarityIndex) : [];
+                if (itemsForCutscene.length > 0) {
+                    for (const item of itemsForCutscene) {
+                        await new Promise(resolve => showCutscene(item, resolve));
+                    }
+                    showStatusMessage(`${pullCount}개의 아이템 중 ${itemsForCutscene.length}개의 컷씬을 모두 재생했습니다!`, 'green');
+                } else {
+                    showStatusMessage(`${pullCount}개의 아이템을 뽑았습니다!`, 'green');
+                    pulledItems.sort((a, b) => rarityOrder.indexOf(b.rarity) - rarityOrder.indexOf(a.rarity));
+                    playGachaAnimation(pulledItems[0]);
+                }
+                pullButton.disabled = false;
+                pull10Button.disabled = false;
+            }
+        }
+        
         function addItemToInventory(item) {
             const invItem = gameState.inventory.find(i => i.id === item.id && i.grade === item.grade && i.level === item.level);
             if (invItem) {
@@ -570,7 +684,6 @@
             }
             updatePokedex(item);
 
-            // Special Item Triggers
             if (item.id === 20 && !gameState.kiwiHunt.unlocked) {
                 gameState.kiwiHunt.unlocked = true;
                 addMessage({ title: '숨겨진 기운', content: 'kiwihacker의 뱃지를 얻자 세상 곳곳에 숨겨져 있던 키위의 기운이 느껴지기 시작합니다...'});
@@ -602,8 +715,9 @@
             const existingUpgraded = gameState.inventory.find(i => i.id === itemId && i.grade === itemGrade && i.level === newLevel);
             if (existingUpgraded) { existingUpgraded.count++; } else { gameState.inventory.push(upgradedItem); }
             const pokedexKey = `${itemId}-${itemGrade}`;
-            if (!gameState.pokedex[pokedexKey]) { gameState.pokedex[pokedexKey] = { count: 0, maxLevel: 0 }; }
-            if (newLevel > gameState.pokedex[pokedexKey].maxLevel) { gameState.pokedex[pokedexKey].maxLevel = newLevel; }
+            if (newLevel > (gameState.pokedex[pokedexKey]?.maxLevel || 0)) {
+                gameState.pokedex[pokedexKey].maxLevel = newLevel;
+            }
             showStatusMessage('아이템 강화 성공!', 'green');
             updateMissionProgress('combines', 1);
             if (newLevel === 3) { updateMissionProgress(`level3_${itemId}`, 1); }
@@ -616,27 +730,119 @@
         function getSellPrice(item) { const itemData = items.find(i => i.id === item.id); if (!itemData) return 0; const rarityMultiplier = RARITY_SETTINGS[itemData.rarity].sellMultiplier; const gradeMultiplier = GRADE_SETTINGS[item.grade]?.multiplier || 1; const levelMultiplier = item.level; const basePrice = (items.length - items.findIndex(i => i.id === item.id)) * 10; return Math.floor(basePrice * rarityMultiplier * gradeMultiplier * levelMultiplier); }
         function updateUI() { gameState.coins = Math.max(0, gameState.coins); coinsElement.textContent = Math.floor(gameState.coins).toLocaleString(); renderInventory(); renderPokedex(); renderSellInventory(); renderMoneyMakingSlots(); updateTotalEps(); renderMissions(); renderMessages(); updateSettingsUI(); checkCombineButton(); updateKiwiHuntEmojis(); adminPanelButton.classList.toggle('hidden', !gameState.adminEnabled); }
         function getGradeTag(grade) { if (grade === 'general') return ''; return ` (${GRADE_SETTINGS[grade].name})`; }
-        function renderInventory() { contentInventory.innerHTML = ''; const sortedInventory = gameState.inventory.sort((a,b) => { const itemA = items.find(i => i.id === a.id); const itemB = items.find(i => i.id === b.id); const rarityA = Object.keys(RARITY_SETTINGS).indexOf(itemA.rarity); const rarityB = Object.keys(RARITY_SETTINGS).indexOf(itemB.rarity); if (rarityA !== rarityB) return rarityA - rarityB; if (a.id !== b.id) return a.id - b.id; const gradeA = Object.keys(GRADE_SETTINGS).indexOf(a.grade); const gradeB = Object.keys(GRADE_SETTINGS).indexOf(b.grade); if(gradeA !== gradeB) return gradeA - gradeB; return a.level - b.level; }); sortedInventory.forEach(item => { const itemData = items.find(i => i.id === item.id); if (itemData) { const card = document.createElement('div'); card.className = `item-card rarity-${itemData.rarity} item-grade-${item.grade} level-${item.level}`; card.dataset.itemId = item.id; card.dataset.itemGrade = item.grade; card.dataset.itemLevel = item.level; card.innerHTML = `<span class="text-4xl">${itemData.emoji}</span><p class="text-sm font-bold truncate mt-2">${itemData.name}${getGradeTag(item.grade)}</p><p class="text-xs text-gray-400">Lv.${item.level} | ${itemData.rarity}</p><div class="absolute top-1 right-1 bg-gray-700 text-xs px-2 py-1 rounded-full">${item.count}</div>`; if (item.level < 3 && item.count >= 3) { card.classList.add('combinable'); } card.addEventListener('click', () => { const currentSelected = contentInventory.querySelector('.item-card.selected'); if(currentSelected && (currentSelected.dataset.itemId != item.id || currentSelected.dataset.itemGrade != item.grade || currentSelected.dataset.itemLevel != item.level)) { currentSelected.classList.remove('selected'); } card.classList.toggle('selected'); checkCombineButton(); }); contentInventory.appendChild(card); } }); }
-        function renderPokedex() { const activeGradeEl = document.querySelector('.pokedex-grade-tab.active'); if(!activeGradeEl) return; const activeGrade = activeGradeEl.dataset.grade; pokedexGrid.innerHTML = ''; items.forEach(item => { if ((item.rarity === 'secret' || item.rarity === 'og') && !Object.keys(gameState.pokedex).some(key => key.startsWith(`${item.id}-`))) { return; } const pokedexKey = `${item.id}-${activeGrade}`; const isSeen = gameState.pokedex[pokedexKey] && gameState.pokedex[pokedexKey].count > 0; const card = document.createElement('div'); card.className = `item-card rarity-${item.rarity} item-grade-${activeGrade}`; card.dataset.itemId = item.id; card.dataset.itemGrade = activeGrade; card.innerHTML = `<span class="text-4xl">${isSeen ? item.emoji : '❓'}</span><p class="text-sm font-bold truncate mt-2">${isSeen ? item.name + getGradeTag(activeGrade) : '???'}</p><p class="text-xs text-gray-400">${isSeen ? item.rarity : '알 수 없음'}</p>`; if (isSeen) { card.addEventListener('click', () => showPokedexInfo(item.id, activeGrade)); } pokedexGrid.appendChild(card); }); }
-        function showPokedexInfo(itemId, grade) { const itemData = items.find(i => i.id === itemId); if(!itemData) return; const pokedexKey = `${itemId}-${grade}`; const pokedexEntry = gameState.pokedex[pokedexKey] || { count: 0, maxLevel: 0 }; pokedexItemName.textContent = itemData.name + getGradeTag(grade); pokedexItemName.className = `text-2xl font-bold mb-2 text-center rarity-${itemData.rarity} item-grade-${grade}`; pokedexItemCount.textContent = pokedexEntry.count + '개'; pokedexItemLevel.textContent = 'Lv.' + pokedexEntry.maxLevel; pokedexItemRarity.textContent = itemData.rarity; const baseChance = RARITY_SETTINGS[itemData.rarity].chance; const gradeDivider = GRADE_SETTINGS[grade].chanceDivider; const finalChance = baseChance / gradeDivider; const totalWeight = gachaPool.reduce((sum, item) => sum + item.chance, 0); const probability = (finalChance / totalWeight) * 100; pokedexItemChance.textContent = (probability < 0.0001 ? probability.toExponential(2) : probability.toFixed(6)) + '%'; pokedexItemDescription.textContent = itemData.description; const tempItem = { id: itemId, grade: grade, level: 1 }; pokedexItemEps.textContent = `${calculateEPS(tempItem).toLocaleString()}`; const secretKiwi = document.querySelector('[data-hunt-location="pokedex-secret"]'); const cupKiwi = document.querySelector('[data-hunt-location="pokedex-cup"]'); const isSecretFound = gameState.kiwiHunt.found.includes('pokedex-secret'); const isCupFound = gameState.kiwiHunt.found.includes('pokedex-cup'); secretKiwi.classList.toggle('hidden', !(gameState.kiwiHunt.unlocked && itemId === 19 && !isSecretFound)); cupKiwi.classList.toggle('hidden', !(gameState.kiwiHunt.unlocked && itemId === 1 && !isCupFound)); showModal(pokedexInfoModal); }
-        function renderSellInventory() { sellInventoryGrid.innerHTML = ''; gameState.inventory.forEach(invItem => { const itemData = items.find(i => i.id === invItem.id); if (itemData) { const card = document.createElement('div'); card.className = `item-card rarity-${itemData.rarity} item-grade-${invItem.grade}`; const sellPrice = getSellPrice(invItem); card.innerHTML = `<span class="text-4xl">${itemData.emoji}</span><p class="text-sm font-bold truncate mt-2">${itemData.name}${getGradeTag(invItem.grade)}</p><p class="text-xs text-gray-400">Lv.${invItem.level} | ${invItem.count}개</p>${itemData.rarity === 'og' ? `<button class="interactable-button text-xs mt-2 w-full" disabled>판매 불가</button>` : `<button class="interactable-button bg-red-600 border-red-700 text-xs mt-2 w-full sell-btn" data-item-id="${invItem.id}" data-item-level="${invItem.level}" data-item-grade="${invItem.grade}">판매 (${sellPrice.toLocaleString()})</button>`}`; sellInventoryGrid.appendChild(card); } }); }
+        
+        function renderInventory() {
+            contentInventory.innerHTML = '';
+            const sortedInventory = gameState.inventory.sort((a,b) => {
+                const itemA = items.find(i => i.id === a.id);
+                const itemB = items.find(i => i.id === b.id);
+                const rarityA = Object.keys(RARITY_SETTINGS).indexOf(itemA.rarity);
+                const rarityB = Object.keys(RARITY_SETTINGS).indexOf(itemB.rarity);
+                if (rarityA !== rarityB) return rarityA - rarityB;
+                if (a.id !== b.id) return a.id - b.id;
+                const gradeA = Object.keys(GRADE_SETTINGS).indexOf(a.grade);
+                const gradeB = Object.keys(GRADE_SETTINGS).indexOf(b.grade);
+                if(gradeA !== gradeB) return gradeA - gradeB;
+                return a.level - b.level;
+            });
+            sortedInventory.forEach(item => {
+                const itemData = items.find(i => i.id === item.id);
+                if (itemData) {
+                    const card = document.createElement('div');
+                    card.className = `item-card rarity-${itemData.rarity} level-${item.level}`;
+                    card.dataset.itemId = item.id;
+                    card.dataset.itemGrade = item.grade;
+                    card.dataset.itemLevel = item.level;
+                    card.innerHTML = `<span class="text-4xl">${itemData.emoji}</span><p class="text-sm font-bold truncate mt-2 item-grade-${item.grade}">${itemData.name}${getGradeTag(item.grade)}</p><p class="text-xs text-gray-400">Lv.${item.level} | ${itemData.rarity}</p><div class="absolute top-1 right-1 bg-gray-700 text-xs px-2 py-1 rounded-full">${item.count}</div>`;
+                    if (item.level < 3 && item.count >= 3) { card.classList.add('combinable'); }
+                    
+                    // FIX: Re-verified item selection logic for enhancement.
+                    card.addEventListener('click', () => {
+                        const currentSelected = contentInventory.querySelector('.item-card.selected');
+                        if(currentSelected && (currentSelected.dataset.itemId != item.id || currentSelected.dataset.itemGrade != item.grade || currentSelected.dataset.itemLevel != item.level)) {
+                            currentSelected.classList.remove('selected');
+                        }
+                        card.classList.toggle('selected');
+                        checkCombineButton();
+                    });
+                    contentInventory.appendChild(card);
+                }
+            });
+        }
+
+        function renderPokedex() { const activeGradeEl = document.querySelector('.pokedex-grade-tab.active'); if(!activeGradeEl) return; const activeGrade = activeGradeEl.dataset.grade; pokedexGrid.innerHTML = ''; items.forEach(item => { if ((item.rarity === 'secret' || item.rarity === 'og') && !Object.keys(gameState.pokedex).some(key => key.startsWith(`${item.id}-`))) { return; } const pokedexKey = `${item.id}-${activeGrade}`; const isSeen = gameState.pokedex[pokedexKey] && gameState.pokedex[pokedexKey].count > 0; const card = document.createElement('div'); card.className = `item-card rarity-${item.rarity}`; card.dataset.itemId = item.id; card.dataset.itemGrade = activeGrade; card.innerHTML = `<span class="text-4xl">${isSeen ? item.emoji : '❓'}</span><p class="text-sm font-bold truncate mt-2 item-grade-${activeGrade}">${isSeen ? item.name + getGradeTag(activeGrade) : '???'}</p><p class="text-xs text-gray-400">${isSeen ? item.rarity : '알 수 없음'}</p>`; if (isSeen) { card.addEventListener('click', () => showPokedexInfo(item.id, activeGrade)); } pokedexGrid.appendChild(card); }); }
+        function showPokedexInfo(itemId, grade) { const itemData = items.find(i => i.id === itemId); if(!itemData) return; const pokedexKey = `${itemId}-${grade}`; const pokedexEntry = gameState.pokedex[pokedexKey] || { count: 0, maxLevel: 0 }; pokedexItemName.innerHTML = `<span class="rarity-${itemData.rarity} item-grade-${grade}">${itemData.name + getGradeTag(grade)}</span>`; pokedexItemCount.textContent = pokedexEntry.count + '개'; pokedexItemLevel.textContent = 'Lv.' + pokedexEntry.maxLevel; pokedexItemRarity.textContent = itemData.rarity; const baseChance = RARITY_SETTINGS[itemData.rarity].chance; const gradeDivider = GRADE_SETTINGS[grade].chanceDivider; const finalChance = baseChance / gradeDivider; const totalWeight = gachaPool.reduce((sum, item) => sum + item.chance, 0); const probability = (finalChance / totalWeight) * 100; pokedexItemChance.textContent = (probability < 0.0001 ? probability.toExponential(2) : probability.toFixed(6)) + '%'; pokedexItemDescription.textContent = itemData.description; const tempItem = { id: itemId, grade: grade, level: 1 }; pokedexItemEps.textContent = `${calculateEPS(tempItem).toLocaleString()}`; const secretKiwi = document.querySelector('[data-hunt-location="pokedex-secret"]'); const cupKiwi = document.querySelector('[data-hunt-location="pokedex-cup"]'); const isSecretFound = gameState.kiwiHunt.found.includes('pokedex-secret'); const isCupFound = gameState.kiwiHunt.found.includes('pokedex-cup'); secretKiwi.classList.toggle('hidden', !(gameState.kiwiHunt.unlocked && itemId === 19 && !isSecretFound)); cupKiwi.classList.toggle('hidden', !(gameState.kiwiHunt.unlocked && itemId === 1 && !isCupFound)); showModal(pokedexInfoModal); }
+        function renderSellInventory() { sellInventoryGrid.innerHTML = ''; gameState.inventory.forEach(invItem => { const itemData = items.find(i => i.id === invItem.id); if (itemData) { const card = document.createElement('div'); card.className = `item-card rarity-${itemData.rarity}`; const sellPrice = getSellPrice(invItem); card.innerHTML = `<span class="text-4xl">${itemData.emoji}</span><p class="text-sm font-bold truncate mt-2 item-grade-${invItem.grade}">${itemData.name}${getGradeTag(invItem.grade)}</p><p class="text-xs text-gray-400">Lv.${invItem.level} | ${invItem.count}개</p>${itemData.rarity === 'og' ? `<button class="interactable-button text-xs mt-2 w-full" disabled>판매 불가</button>` : `<button class="interactable-button bg-red-600 border-red-700 text-xs mt-2 w-full sell-btn" data-item-id="${invItem.id}" data-item-level="${invItem.level}" data-item-grade="${invItem.grade}">판매 (${sellPrice.toLocaleString()})</button>`}`; sellInventoryGrid.appendChild(card); } }); }
         function sellItem(itemId, itemGrade, itemLevel) { const invItem = gameState.inventory.find(i => i.id === itemId && i.grade === itemGrade && i.level === itemLevel); if (!invItem) { showStatusMessage('판매할 아이템을 찾을 수 없습니다.', 'red'); return; } const itemData = items.find(i => i.id === invItem.id); if (!itemData) return; const price = getSellPrice(invItem); showConfirmModal('아이템 판매', `정말로 ${itemData.name}${getGradeTag(invItem.grade)} Lv.${invItem.level} 아이템을 ${price.toLocaleString()} 코인에 판매하시겠습니까?`, () => { const itemToSell = gameState.inventory.find(i => i.id === itemId && i.grade === itemGrade && i.level === itemLevel); if (!itemToSell || itemToSell.count <= 0) { showStatusMessage('이미 판매되었거나 없는 아이템입니다.', 'red'); updateUI(); return; } gameState.coins += price; updateMissionProgress('coins_earned', price); itemToSell.count--; gameState.inventory = gameState.inventory.filter(item => item.count > 0); updateUI(); saveGame(); showStatusMessage(`${itemData.name} 아이템을 ${price.toLocaleString()} 코인에 판매했습니다.`, 'green'); }); }
-        function renderMoneyMakingSlots() { moneyMakingSlotsContainer.innerHTML = ''; gameState.moneyMaking.slots.forEach((item, index) => { const slot = document.createElement('div'); slot.classList.add('money-slot'); slot.dataset.slotIndex = index; if (item) { const itemData = items.find(i => i.id === item.id); if (itemData) { slot.innerHTML = `<div class="item-content"><span class="text-4xl">${itemData.emoji}</span><p class="text-sm font-bold truncate mt-1">${itemData.name}${getGradeTag(item.grade)}</p><p class="text-xs text-gray-400">Lv.${item.level} | ${calculateEPS(item).toLocaleString()}/s</p></div><button class="remove-btn" data-slot-index="${index}">&times;</button>`; slot.classList.add('rarity-' + itemData.rarity, `item-grade-${item.grade}`); slot.querySelector('.remove-btn').addEventListener('click', (e) => { e.stopPropagation(); removeItemFromMoneyMaking(index); }); } } else { slot.innerHTML = `<span class="plus-sign">+</span>`; slot.addEventListener('click', () => { showItemSelectionModal(index); }); } moneyMakingSlotsContainer.appendChild(slot); }); }
-        function showItemSelectionModal(slotIndex) { itemSelectionGrid.innerHTML = ''; const sortedInventory = [...gameState.inventory].sort((a,b) => calculateEPS(b) - calculateEPS(a)); sortedInventory.forEach(invItem => { const itemData = items.find(i => i.id === invItem.id); const card = document.createElement('div'); card.className = `item-card rarity-${itemData.rarity} item-grade-${invItem.grade}`; card.innerHTML = `<span class="text-4xl">${itemData.emoji}</span><p class="text-sm font-bold truncate mt-2">${itemData.name}${getGradeTag(invItem.grade)}</p><p class="text-xs text-gray-400">Lv.${invItem.level} | ${invItem.count}개</p><p class="text-xs text-green-400">${calculateEPS(invItem).toLocaleString()}/s</p>`; card.addEventListener('click', () => { placeItemInMoneyMaking(slotIndex, invItem); hideModal(itemSelectionModal); }); itemSelectionGrid.appendChild(card); }); showModal(itemSelectionModal); }
+        function renderMoneyMakingSlots() { moneyMakingSlotsContainer.innerHTML = ''; gameState.moneyMaking.slots.forEach((item, index) => { const slot = document.createElement('div'); slot.classList.add('money-slot'); slot.dataset.slotIndex = index; if (item) { const itemData = items.find(i => i.id === item.id); if (itemData) { slot.innerHTML = `<div class="item-content"><span class="text-4xl">${itemData.emoji}</span><p class="text-sm font-bold truncate mt-1 item-grade-${item.grade}">${itemData.name}${getGradeTag(item.grade)}</p><p class="text-xs text-gray-400">Lv.${item.level} | ${calculateEPS(item).toLocaleString()}/s</p></div><button class="remove-btn" data-slot-index="${index}">&times;</button>`; slot.querySelector('.remove-btn').addEventListener('click', (e) => { e.stopPropagation(); removeItemFromMoneyMaking(index); }); } } else { slot.innerHTML = `<span class="text-4xl">+</span>`; slot.addEventListener('click', () => { showItemSelectionModal(index); }); } moneyMakingSlotsContainer.appendChild(slot); }); }
+        function showItemSelectionModal(slotIndex) { itemSelectionGrid.innerHTML = ''; const sortedInventory = [...gameState.inventory].sort((a,b) => calculateEPS(b) - calculateEPS(a)); sortedInventory.forEach(invItem => { const itemData = items.find(i => i.id === invItem.id); const card = document.createElement('div'); card.className = `item-card rarity-${itemData.rarity}`; card.innerHTML = `<span class="text-4xl">${itemData.emoji}</span><p class="text-sm font-bold truncate mt-2 item-grade-${invItem.grade}">${itemData.name}${getGradeTag(invItem.grade)}</p><p class="text-xs text-gray-400">Lv.${invItem.level} | ${invItem.count}개</p><p class="text-xs text-green-400">${calculateEPS(invItem).toLocaleString()}/s</p>`; card.addEventListener('click', () => { placeItemInMoneyMaking(slotIndex, invItem); hideModal(itemSelectionModal); }); itemSelectionGrid.appendChild(card); }); showModal(itemSelectionModal); }
         function placeItemInMoneyMaking(slotIndex, item) { const invItem = gameState.inventory.find(i => i.id === item.id && i.grade === item.grade && i.level === item.level); if (invItem && invItem.count > 0) { removeItemFromMoneyMaking(slotIndex, false); gameState.moneyMaking.slots[slotIndex] = {id: invItem.id, grade: invItem.grade, level: invItem.level, count: 1}; invItem.count--; if(invItem.count === 0) { gameState.inventory = gameState.inventory.filter(i => i !== invItem); } updateUI(); saveGame(); } }
         function removeItemFromMoneyMaking(slotIndex, doUpdate = true) { const itemToReturn = gameState.moneyMaking.slots[slotIndex]; if (itemToReturn) { const existingItem = gameState.inventory.find(i => i.id === itemToReturn.id && i.grade === itemToReturn.grade && i.level === itemToReturn.level); if(existingItem) { existingItem.count++; } else { gameState.inventory.push(itemToReturn); } gameState.moneyMaking.slots[slotIndex] = null; if (doUpdate) { updateUI(); saveGame(); } } }
         function updateTotalEps() { let currentEPS = 0; gameState.moneyMaking.slots.forEach(item => { if (item) currentEPS += calculateEPS(item); }); totalEpsEl.textContent = currentEPS.toLocaleString(); }
         function collectAllCoins() { const uncollected = Math.floor(gameState.moneyMaking.uncollected); if (uncollected <= 0) { showStatusMessage('모을 코인이 없습니다.', 'red'); return; } gameState.coins += uncollected; gameState.moneyMaking.uncollected -= uncollected; updateMissionProgress('uncollected_coins', uncollected); updateMissionProgress('coins_earned', uncollected); updateUI(); saveGame(); showStatusMessage(`${uncollected.toLocaleString()} 코인을 수집했습니다!`, 'green'); }
         function checkCombineButton() { const selectedItemCard = contentInventory.querySelector('.item-card.selected'); if(selectedItemCard){ const itemId = parseInt(selectedItemCard.dataset.itemId); const itemGrade = selectedItemCard.dataset.itemGrade; const itemLevel = parseInt(selectedItemCard.dataset.itemLevel); const inventoryItem = gameState.inventory.find(i => i.id === itemId && i.grade === itemGrade && i.level === itemLevel); combineButton.disabled = !(inventoryItem && inventoryItem.count >= 3 && itemLevel < 3); } else { combineButton.disabled = true; } }
-        function renderMessages() { messageList.innerHTML = ''; let unreadCount = 0; const sortedMessages = [...gameState.messages].sort((a, b) => b.id - a.id); sortedMessages.forEach(message => { const item = document.createElement('div'); item.className = 'message-item p-4 cursor-pointer'; if (message.read) { item.classList.add('read'); } else { unreadCount++; } if (message.reward && !message.claimed) { item.innerHTML = `<div><span class="font-bold text-yellow-400">${message.title}</span><span class="text-xs text-green-400 block">보상 있음!</span></div><span class="text-xs text-gray-500">${new Date(message.id).toLocaleDateString()}</span>`; } else { item.innerHTML = `<span class="font-bold">${message.title}</span><span class="text-xs text-gray-500">${new Date(message.id).toLocaleDateString()}</span>`; } item.addEventListener('click', () => showMessageDetail(message)); messageList.appendChild(item); }); const showDot = unreadCount > 0 && gameState.settings.notification; messageNotificationDot.style.display = showDot ? 'block' : 'none'; messageSubtabDot.style.display = showDot ? 'block' : 'none'; }
-        function showMessageDetail(message) { messageDetailTitle.textContent = message.title; messageDetailContent.textContent = message.content; messageDetailRewardSection.innerHTML = ''; if (message.reward) { const rewardButton = document.createElement('button'); rewardButton.className = 'interactable-button bg-green-600 mt-4'; rewardButton.disabled = message.claimed; if (message.reward.type === 'coins') { rewardButton.textContent = message.claimed ? '보상 수령 완료' : `보상 받기 (${message.reward.amount.toLocaleString()} 코인)`; } else if (message.reward.type === 'clearKey') { rewardButton.textContent = message.claimed ? '열쇠 조각 획득 완료' : `클리어를 위한 열쇠 조각 - ${message.reward.key} 획득`; } rewardButton.addEventListener('click', () => { claimReward(message, rewardButton); }); messageDetailRewardSection.appendChild(rewardButton); } if (!message.read) { message.read = true; updateUI(); saveGame(); } showModal(messageDetailModal); }
+        function renderMessages() { messageList.innerHTML = ''; let unreadCount = 0; const sortedMessages = [...gameState.messages].sort((a, b) => b.id - a.id); sortedMessages.forEach(message => { const item = document.createElement('div'); item.className = 'message-item p-4 border-b border-gray-700 cursor-pointer hover:bg-gray-700'; if (message.read) { item.classList.add('read'); } else { unreadCount++; } if (message.reward && !message.claimed) { item.innerHTML = `<div><span class="font-bold text-yellow-400">${message.title}</span><span class="text-xs text-green-400 block">보상 있음!</span></div><span class="text-xs text-gray-500">${new Date(message.id).toLocaleDateString()}</span>`; } else { item.innerHTML = `<span class="font-bold">${message.title}</span><span class="text-xs text-gray-500">${new Date(message.id).toLocaleDateString()}</span>`; } item.addEventListener('click', () => showMessageDetail(message)); messageList.appendChild(item); }); const showDot = unreadCount > 0 && gameState.settings.notification; messageNotificationDot.style.display = showDot ? 'block' : 'none'; messageSubtabDot.style.display = showDot ? 'block' : 'none'; }
+        
+        function showMessageDetail(message) {
+            messageDetailTitle.textContent = message.title;
+            messageDetailContent.textContent = message.content;
+            messageDetailRewardSection.innerHTML = '';
+
+            if (message.reward) {
+                const rewardButton = document.createElement('button');
+                if (message.reward.type === 'truth') {
+                    rewardButton.className = 'interactable-button bg-yellow-500 mt-4';
+                    rewardButton.textContent = '세상의 진실을 보기';
+                    rewardButton.addEventListener('click', () => {
+                        showGameClearMarquee();
+                        hideModal(messageDetailModal);
+                    });
+                } else {
+                    rewardButton.className = 'interactable-button bg-green-600 mt-4';
+                    rewardButton.disabled = message.claimed;
+                    if (message.reward.type === 'coins') {
+                        rewardButton.textContent = message.claimed ? '보상 수령 완료' : `보상 받기 (${message.reward.amount.toLocaleString()} 코인)`;
+                    } else if (message.reward.type === 'clearKey') {
+                        rewardButton.textContent = message.claimed ? '열쇠 조각 획득 완료' : `클리어를 위한 열쇠 조각 - ${message.reward.key} 획득`;
+                    }
+                    rewardButton.addEventListener('click', () => {
+                        claimReward(message, rewardButton);
+                    });
+                }
+                messageDetailRewardSection.appendChild(rewardButton);
+            }
+
+            if (!message.read) {
+                message.read = true;
+                updateUI();
+                saveGame();
+            }
+            showModal(messageDetailModal);
+        }
+
         function claimReward(message, button) { if(message.claimed) return; message.claimed = true; button.disabled = true; if (message.reward.type === 'coins') { gameState.coins += message.reward.amount; updateMissionProgress('coins_earned', message.reward.amount); button.textContent = '보상 수령 완료'; showStatusMessage(`${message.reward.amount.toLocaleString()} 코인을 획득했습니다!`, 'green'); } else if (message.reward.type === 'clearKey') { gameState.clearProgress[`key${message.reward.key}`] = true; button.textContent = `열쇠 조각 - ${message.reward.key} 획득 완료`; showStatusMessage(`클리어를 위한 열쇠 조각 - ${message.reward.key} 획득!`, 'yellow'); checkGameClear(); } updateUI(); saveGame(); }
         function markAllMessagesRead() { let claimedRewards = false; gameState.messages.forEach(message => { message.read = true; if (message.reward && !message.claimed) { message.claimed = true; claimedRewards = true; if (message.reward.type === 'coins') { gameState.coins += message.reward.amount; updateMissionProgress('coins_earned', message.reward.amount); } else if (message.reward.type === 'clearKey') { gameState.clearProgress[`key${message.reward.key}`] = true; checkGameClear(); } } }); if(claimedRewards) showStatusMessage('모든 보상을 수령하고, 메시지를 읽음 처리했습니다.', 'green'); updateUI(); saveGame(); }
         function updateMissionProgress(type, amount = 1) { let missionCompleted = false; if(type.startsWith('level3')) { const mission = ALL_MISSIONS.find(m => m.type === type); if(mission && !gameState.missionProgress[mission.id].completed) { gameState.missionProgress[mission.id].progress = 1; } } else { ALL_MISSIONS.forEach(mission => { if (mission.type === type && !gameState.missionProgress[mission.id].completed) { gameState.missionProgress[mission.id].progress += amount; } }); } gameState.stats[`total_${type}`] = (gameState.stats[`total_${type}`] || 0) + amount; ALL_MISSIONS.forEach(mission => { const progressData = gameState.missionProgress[mission.id]; if (!progressData.completed && progressData.progress >= mission.target) { progressData.completed = true; missionCompleted = true; addMessage({ title: `미션 완료: ${mission.title}`, content: `${mission.title} 미션을 완료했습니다! 메시지함에서 보상을 확인하세요.`, reward: mission.reward }); } }); if(missionCompleted) { const completedCount = ALL_MISSIONS.filter(m => gameState.missionProgress[m.id].completed).length; if (completedCount >= ALL_MISSIONS.length && !gameState.clearProgress.key1) { addMessage({ title: '위대한 여정의 끝', content: '모든 미션을 완료하셨습니다! 클리어에 한 발짝 다가갑니다.', reward: { type: 'clearKey', key: 1 } }); } updateUI(); saveGame(); } }
         function addMessage(msg) { gameState.messages.push({ id: Date.now(), read: false, claimed: !msg.reward, ...msg }); updateUI(); }
         function renderMissions() { missionContentActive.innerHTML = ''; missionContentCompleted.innerHTML = ''; let activeCount = 0; let completedCount = 0; ALL_MISSIONS.forEach(mission => { const progressData = gameState.missionProgress[mission.id]; if (!progressData) return; const targetContainer = progressData.completed ? missionContentCompleted : missionContentActive; if(progressData.completed) completedCount++; else activeCount++; const item = document.createElement('div'); item.classList.add('mission-item'); if(progressData.completed) { item.innerHTML = `<div class="flex justify-between items-center"><span class="font-bold text-gray-500 line-through">${mission.title}</span><span class="text-green-500 font-bold">완료</span></div>`; } else { const progress = progressData.progress || 0; const progressPercentage = Math.min(100, (progress / mission.target) * 100); item.innerHTML = `<div class="flex justify-between items-center mb-2"><span class="font-bold">${mission.title}</span><span class="text-xs text-yellow-400">보상: ${mission.reward.amount.toLocaleString()} 코인</span></div><div class="w-full bg-gray-700 rounded-full h-4 relative"><div class="bg-green-500 h-4 rounded-full" style="width: ${progressPercentage}%"></div><span class="absolute w-full h-full top-0 left-0 text-center text-xs leading-4 text-white font-bold">${Math.floor(progress).toLocaleString()}/${mission.target.toLocaleString()}</span></div>`; } targetContainer.appendChild(item); }); if (activeCount === 0) missionContentActive.innerHTML = '<p class="text-center text-gray-400">진행 중인 미션이 없습니다.</p>'; if (completedCount === 0) missionContentCompleted.innerHTML = '<p class="text-center text-gray-400">완료한 미션이 없습니다.</p>'; }
         function updateSettingsUI() { settingToggleCutscene.textContent = gameState.settings.cutscene ? 'ON' : 'OFF'; settingToggleSound.textContent = gameState.settings.sound ? 'ON' : 'OFF'; settingToggleNotification.textContent = gameState.settings.notification ? 'ON' : 'OFF'; cutsceneOptions.classList.toggle('hidden', !gameState.settings.cutscene); if (gameState.settings.cutscene) { settingCutsceneRarity.value = gameState.settings.cutsceneMinRarity; settingToggleCutsceneMulti.textContent = gameState.settings.cutsceneOnMultiPull ? 'ON' : 'OFF'; } }
-        function checkGameClear() { if (gameState.gameCleared) return; const { key1, key2, key3, key4, key5 } = gameState.clearProgress; if (key1 && key2 && key3 && key4 && key5) { gameState.gameCleared = true; addMessage({ title: '클리어를 축하드립니다!', content: '마침내 모든 열쇠 조각을 모아 게임을 클리어했습니다! 당신은 진정한 럭키 뽑기 머신의 마스터입니다!' }); setTimeout(() => showModal(document.getElementById('clear-modal')), 1000); saveGame(); } }
+        
+        function checkGameClear() {
+            if (gameState.gameCleared) return;
+            const { key1, key2, key3, key4, key5 } = gameState.clearProgress;
+            if (key1 && key2 && key3 && key4 && key5) {
+                gameState.gameCleared = true;
+                addMessage({
+                    title: '클리어를 축하드립니다!',
+                    content: '마침내 모든 것을 이루어냈습니다. 보상으로 세상의 진실을 확인하세요.',
+                    reward: { type: 'truth' },
+                    claimed: false
+                });
+                setTimeout(() => showModal(document.getElementById('clear-modal')), 1000);
+                saveGame();
+            }
+        }
+
         function updateKiwiHuntEmojis() { const staticKiwiLocations = ['shop', 'money-making', 'settings']; staticKiwiLocations.forEach(location => { const emoji = document.querySelector(`.kiwi-hunt-emoji[data-hunt-location="${location}"]`); if (emoji) { const isFound = gameState.kiwiHunt.found.includes(location); const shouldShow = gameState.kiwiHunt.unlocked && !isFound; emoji.classList.toggle('hidden', !shouldShow); } }); }
         function handleKiwiHuntClick(e) { const emoji = e.target; const location = emoji.dataset.huntLocation; if (!gameState.kiwiHunt.found.includes(location)) { emoji.classList.add('hidden'); gameState.kiwiHunt.found.push(location); showStatusMessage(`비밀 키위를 찾았습니다! (${gameState.kiwiHunt.found.length}/6)`, 'yellow'); if(gameState.kiwiHunt.found.length === 6) { addMessage({ title: '키위 숭배', content: '세상의 모든 키위를 찾아냈습니다. 키위의 가호가 당신과 함께합니다.', reward: { type: 'clearKey', key: 2 } }); } saveGame(); } }
         function showModal(modalElement) { modalElement.style.display = 'flex'; }
@@ -644,7 +850,7 @@
         function showStatusMessage(message, color) { const container = document.getElementById('gacha-screen'); const statusDiv = document.createElement('div'); statusDiv.textContent = message; statusDiv.className = 'fixed bottom-8 left-1/2 -translate-x-1/2 px-6 py-3 rounded-full text-white font-bold z-[10002]'; statusDiv.style.backdropFilter = 'blur(5px)'; statusDiv.style.animation = 'fadeIn 0.5s ease-out'; if (color === 'red') statusDiv.style.backgroundColor = 'rgba(239, 68, 68, 0.8)'; else if (color === 'yellow') statusDiv.style.backgroundColor = 'rgba(250, 204, 21, 0.8)'; else statusDiv.style.backgroundColor = 'rgba(34, 197, 94, 0.8)'; container.appendChild(statusDiv); setTimeout(() => { statusDiv.style.animation = 'fadeOut 0.5s ease-in forwards'; setTimeout(() => statusDiv.remove(), 500); }, 2500); }
         function showConfirmModal(title, text, onConfirm) { confirmModalTitle.textContent = title; confirmModalText.textContent = text; const onYesClick = () => { onConfirm(); hideModal(confirmModal); confirmModalYes.removeEventListener('click', onYesClick); }; const onNoClick = () => { hideModal(confirmModal); confirmModalYes.removeEventListener('click', onYesClick); }; confirmModalYes.onclick = null; confirmModalYes.addEventListener('click', onYesClick); confirmModalNo.onclick = onNoClick; showModal(confirmModal); }
         function playGachaAnimation(item) { gachaResult.classList.remove('show'); resultEmoji.textContent = ''; resultText.textContent = '...'; setTimeout(() => { const itemData = items.find(i => i.id === item.id); resultEmoji.textContent = itemData.emoji; resultText.textContent = itemData.name + getGradeTag(item.grade); resultText.className = `result-name rarity-${itemData.rarity} item-grade-${item.grade}`; gachaResult.classList.add('show'); particleContainer.innerHTML = ''; if (item.grade !== 'general') { for(let i = 0; i < 20; i++) { const p = document.createElement('div'); p.className = `particle particle-${item.grade}`; p.style.left = `${Math.random() * 100}%`; p.style.top = `${Math.random() * 100}%`; particleContainer.appendChild(p); } } playSound('pull'); }, 500); }
-        function showCutscene(item, onCompleteCallback) { const rarityOrder = ['general', 'rare', 'lesser-rare', 'legendary', 'mystic', 'transcendent', 'god', 'secret', 'og']; const minRarityIndex = rarityOrder.indexOf(gameState.settings.cutsceneMinRarity); const itemRarityIndex = rarityOrder.indexOf(item.rarity); if (!gameState.settings.cutscene || itemRarityIndex < minRarityIndex) { playGachaAnimation(item); if (onCompleteCallback) setTimeout(onCompleteCallback, 1000); return; } const cutsceneRevealDuration = 5000; const rarityEffects = { 'transcendent': 'particle-effect-time', 'og': 'particle-effect-light', 'legendary': 'particle-effect-light', 'secret': 'particle-effect-dark' }; cutsceneOverlay.style.display = 'flex'; setTimeout(() => cutsceneOverlay.classList.add('active'), 10); cutsceneEmoji.textContent = item.emoji; cutsceneName.textContent = item.name + getGradeTag(item.grade); cutsceneRarity.textContent = item.rarity; cutsceneRarity.className = `cutscene-rarity rarity-${item.rarity} item-grade-${item.grade}`; cutsceneParticles.innerHTML = ''; if (rarityEffects[item.rarity]) { cutsceneParticles.className = 'cutscene-particles'; cutsceneParticles.classList.add(rarityEffects[item.rarity]); generateCutsceneParticles(item.rarity); } setTimeout(() => { cutsceneOverlay.classList.remove('active'); setTimeout(() => { cutsceneOverlay.style.display = 'none'; playGachaAnimation(item); if (onCompleteCallback) setTimeout(onCompleteCallback, 500); }, 500); }, cutsceneRevealDuration); }
+        function showCutscene(item, onCompleteCallback) { const rarityOrder = ['general', 'rare', 'lesser-rare', 'legendary', 'mystic', 'transcendent', 'god', 'secret', 'og']; const minRarityIndex = rarityOrder.indexOf(gameState.settings.cutsceneMinRarity); const itemRarityIndex = rarityOrder.indexOf(item.rarity); if (!gameState.settings.cutscene || itemRarityIndex < minRarityIndex) { playGachaAnimation(item); if (onCompleteCallback) setTimeout(onCompleteCallback, 1000); return; } const cutsceneRevealDuration = 5000; const rarityEffects = { 'transcendent': 'particle-effect-time', 'og': 'particle-effect-light', 'legendary': 'particle-effect-light', 'secret': 'particle-effect-dark' }; cutsceneOverlay.style.display = 'flex'; setTimeout(() => cutsceneOverlay.classList.add('active'), 10); cutsceneEmoji.textContent = item.emoji; cutsceneName.textContent = item.name + getGradeTag(item.grade); cutsceneRarity.textContent = item.rarity; cutsceneRarity.className = `cutscene-rarity rarity-${item.rarity}`; cutsceneParticles.innerHTML = ''; if (rarityEffects[item.rarity]) { cutsceneParticles.className = 'cutscene-particles'; cutsceneParticles.classList.add(rarityEffects[item.rarity]); generateCutsceneParticles(item.rarity); } setTimeout(() => { cutsceneOverlay.classList.remove('active'); setTimeout(() => { cutsceneOverlay.style.display = 'none'; playGachaAnimation(item); if (onCompleteCallback) setTimeout(onCompleteCallback, 500); }, 500); }, cutsceneRevealDuration); }
         function generateCutsceneParticles(rarity) { cutsceneParticles.innerHTML = ''; const particleCount = 20; for (let i = 0; i < particleCount; i++) { const particle = document.createElement('div'); if (rarity === 'og' || rarity === 'legendary') { particle.classList.add('sparkle'); const x = (Math.random() - 0.5) * 600 + 'px'; const y = (Math.random() - 0.5) * 600 + 'px'; particle.style.setProperty('--x', x); particle.style.setProperty('--y', y); particle.style.left = '50%'; particle.style.top = '50%'; } else if (rarity === 'secret') { particle.classList.add('tendril'); const rotationStart = Math.random() * 360; const rotationEnd = rotationStart + (Math.random() * 180 - 90); particle.style.setProperty('--r-start', `${rotationStart}deg`); particle.style.setProperty('--r-end', `${rotationEnd}deg`); particle.style.left = '50%'; particle.style.bottom = '50%'; } else if (rarity === 'transcendent') { particle.classList.add('sand'); const xStart = (Math.random() - 0.5) * 400 + 'px'; const xEnd = (Math.random() - 0.5) * 400 + 'px'; particle.style.setProperty('--x-start', xStart); particle.style.setProperty('--x-end', xEnd); } cutsceneParticles.appendChild(particle); } }
         function playSound(type) { if (!gameState.settings.sound || !audioCtx) return; let frequency = 440, duration = 0.1, waveType = 'sine', gain = 0.3; if (type === 'pull') { frequency = 880; duration = 0.2; waveType = 'triangle'; } if (type === 'coin') { frequency = 1200; duration = 0.05; waveType = 'square'; } if (type === 'combine') { frequency = 600; duration = 0.3; waveType = 'sawtooth'; } const oscillator = audioCtx.createOscillator(); const gainNode = audioCtx.createGain(); oscillator.connect(gainNode); gainNode.connect(audioCtx.destination); oscillator.type = waveType; oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime); gainNode.gain.setValueAtTime(gain, audioCtx.currentTime); gainNode.gain.exponentialRampToValueAtTime(0.00001, audioCtx.currentTime + duration); oscillator.start(audioCtx.currentTime); oscillator.stop(audioCtx.currentTime + duration); }
         let comboClicks = 0, comboTimer, countdownInterval;
@@ -653,7 +859,7 @@
         function endComboMinigame() { resetComboMinigame(); comboClickButton.disabled = true; const earnings = comboClicks * comboClicks; comboResultElement.textContent = `총 ${comboClicks}번 클릭! ${earnings.toLocaleString()} 코인을 획득했습니다!`; gameState.coins += earnings; updateMissionProgress('coins_earned', earnings); if(comboClicks > (gameState.stats.minigame_highscore || 0)) { gameState.stats.minigame_highscore = comboClicks; } updateMissionProgress('minigame_score_cumulative', comboClicks); updateUI(); saveGame(); }
         function setupEventListeners() { pullButton.addEventListener('click', () => pull(1)); pull10Button.addEventListener('click', () => pull(10)); getCoinsButton.addEventListener('click', () => { gameState.coins += 10; updateMissionProgress('coins_earned', 10); updateUI(); showStatusMessage('10 코인을 획득했습니다!', 'green'); playSound('coin'); }); const tabs = { 'tab-inventory': contentInventory, 'tab-pokedex': contentPokedex, 'tab-shop': contentShop, 'tab-money-making': contentMoneyMaking, 'tab-settings': contentSettings }; Object.keys(tabs).forEach(tabId => { document.getElementById(tabId).addEventListener('click', (e) => { document.querySelector('.tab-button.active').classList.remove('active'); e.currentTarget.classList.add('active'); Object.values(tabs).forEach(content => content.classList.add('hidden')); tabs[tabId].classList.remove('hidden'); }); }); [shopTabBuy, shopTabSell].forEach(tab => { tab.addEventListener('click', () => { shopTabBuy.classList.toggle('active', tab === shopTabBuy); shopTabSell.classList.toggle('active', tab === shopTabSell); shopContentBuy.classList.toggle('hidden', tab !== shopTabBuy); shopContentSell.classList.toggle('hidden', tab !== shopTabSell); }); }); subTabs.forEach(tab => { tab.addEventListener('click', (e) => { document.querySelector('#content-settings .sub-tab-button.active').classList.remove('active'); e.currentTarget.classList.add('active'); const subtabName = e.currentTarget.dataset.subtab; Object.values(subtabContents).forEach(content => content.classList.add('hidden')); subtabContents[subtabName]?.classList.remove('hidden'); }); }); pokedexGradeTabs.forEach(tab => { tab.addEventListener('click', (e) => { document.querySelector('.pokedex-grade-tab.active')?.classList.remove('active'); e.currentTarget.classList.add('active'); renderPokedex(); }); }); missionTabs.forEach(tab => { tab.addEventListener('click', (e) => { document.querySelector('.mission-tab.active')?.classList.remove('active'); e.currentTarget.classList.add('active'); const isCompletedTab = e.currentTarget.dataset.missionTab === 'completed'; missionContentActive.classList.toggle('hidden', isCompletedTab); missionContentCompleted.classList.toggle('hidden', !isCompletedTab); }); }); buyLuckBuffBtn.addEventListener('click', () => { const cost = 10000000; if (gameState.coins >= cost) { showConfirmModal('행운 4배 버프 구매', `10,000,000 코인을 지불하고 행운 4배 버프를 구매하시겠습니까? (30분)`, () => { gameState.coins -= cost; gameState.luckBuff.isActive = true; gameState.luckBuff.endTime = Date.now() + (30 * 60 * 1000); updateUI(); saveGame(); showStatusMessage('행운 4배 버프가 활성화되었습니다!', 'green'); }); } else { showStatusMessage('코인이 부족합니다.', 'red'); } }); collectAllBtn.addEventListener('click', collectAllCoins); combineButton.addEventListener('click', combineItems); [closePokedexModal, closeItemSelectionModal, closeMessageDetailModal, closeCodeModal, closeAdminPanelModal].forEach(btn => { btn.addEventListener('click', () => hideModal(btn.closest('.modal'))); }); closeComboModal.addEventListener('click', () => { resetComboMinigame(); hideModal(comboMinigameModal); }); markAllReadBtn.addEventListener('click', markAllMessagesRead); comboMinigameStartButton.addEventListener('click', () => { showModal(comboMinigameModal); startComboMinigame(); }); comboClickButton.addEventListener('click', () => { if (comboClickButton.disabled) return; comboClicks++; comboClicksElement.textContent = comboClicks; }); secretCodeButton.addEventListener('click', () => showModal(codeInputModal)); submitCodeButton.addEventListener('click', () => { const code = secretCodeInput.value.toLowerCase().trim(); codeMessage.textContent = ''; if (code === '양~두~영~이kiwi') { gameState.adminEnabled = true; codeMessage.textContent = '관리자 패널이 활성화되었습니다!'; updateUI(); saveGame(); } else { codeMessage.textContent = '잘못된 코드입니다.'; } });
             adminPanelButton.addEventListener('click', () => { if (gameState.kunaiMinigame.adminLevelSet) { adminKunaiLevelInput.disabled = true; adminSetKunaiLevelBtn.disabled = true; adminKunaiLevelInput.placeholder = "레벨 설정 완료"; } else { adminKunaiLevelInput.disabled = false; adminSetKunaiLevelBtn.disabled = false; adminKunaiLevelInput.placeholder = "쿠나이 레벨 (1-50, 51=클리어)"; } showModal(adminPanelModal); }); 
-            getAllItemsBtn.addEventListener('click', () => { const uniqueItemIds = [...new Set(items.map(item => item.id))]; uniqueItemIds.forEach(id => { Object.keys(GRADE_SETTINGS).forEach(grade => { const baseItem = items.find(i => i.id === id); if (!baseItem) return; const adminItem = { ...baseItem, grade: grade, level: 3, count: 1 }; const invItem = gameState.inventory.find(i => i.id === adminItem.id && i.grade === adminItem.grade && i.level === adminItem.level); if (invItem) { invItem.count++; } else { gameState.inventory.push({ id: adminItem.id, grade: adminItem.grade, level: adminItem.level, count: 1 }); } updatePokedex(adminItem); updateMissionProgress(`level3_${id}`, 1); ALL_MISSIONS.forEach(mission => { if ((mission.type === `grade_${grade}` || mission.type === `rarity_${baseItem.rarity}`) && !gameState.missionProgress[mission.id].completed) { gameState.missionProgress[mission.id].progress = mission.target; } }); }); }); if (!gameState.kiwiHunt.unlocked) { gameState.kiwiHunt.unlocked = true; addMessage({ title: '숨겨진 기운', content: 'kiwihacker의 뱃지를 얻자 세상 곳곳에 숨겨져 있던 키위의 기운이 느껴지기 시작합니다...'}); } updateMissionProgress('pulls', 0); showStatusMessage('모든 아이템을 획득하고 관련 미션을 완료했습니다.', 'green'); updateUI(); saveGame(); });
+            getAllItemsBtn.addEventListener('click', () => { const uniqueItemIds = [...new Set(items.map(item => item.id))]; uniqueItemIds.forEach(id => { Object.keys(GRADE_SETTINGS).forEach(grade => { const baseItem = items.find(i => i.id === id); if (!baseItem) return; const adminItem = { ...baseItem, grade: grade, level: 3 }; const invItem = gameState.inventory.find(i => i.id === adminItem.id && i.grade === adminItem.grade && i.level === adminItem.level); if (invItem) { invItem.count++; } else { gameState.inventory.push({ id: adminItem.id, grade: adminItem.grade, level: adminItem.level, count: 1 }); } updatePokedex(adminItem); updateMissionProgress(`level3_${id}`, 1); ALL_MISSIONS.forEach(mission => { if ((mission.type === `grade_${grade}` || mission.type === `rarity_${baseItem.rarity}`) && !gameState.missionProgress[mission.id].completed) { gameState.missionProgress[mission.id].progress = mission.target; } }); }); }); if (!gameState.clearProgress.key3) { addMessage({ title: '양을 숭배하라~!', content: '전설 속의 인물, 양두영을 손에 넣었습니다! (관리자 보상)', reward: { type: 'clearKey', key: 3 } }); } if (!gameState.clearProgress.key5) { addMessage({ title: '운이 머선일이고?', content: '미지의 아이템을 최고 레벨까지 강화하는 데 성공했습니다! (관리자 보상)', reward: { type: 'clearKey', key: 5 } }); } if (!gameState.kiwiHunt.unlocked) { gameState.kiwiHunt.unlocked = true; addMessage({ title: '숨겨진 기운', content: 'kiwihacker의 뱃지를 얻자 세상 곳곳에 숨겨져 있던 키위의 기운이 느껴지기 시작합니다...' }); } updateMissionProgress('pulls', 0); showStatusMessage('모든 아이템을 획득하고 관련 미션을 완료했습니다.', 'green'); updateUI(); saveGame(); });
             revokeAdminBtn.addEventListener('click', () => { gameState.adminEnabled = false; hideModal(adminPanelModal); showStatusMessage('관리자 권한이 비활성화되었습니다.', 'yellow'); updateUI(); saveGame(); });
             get100mCoinsBtn.addEventListener('click', () => { gameState.coins += 100000000; updateUI(); saveGame(); showStatusMessage('1억 코인을 획득했습니다!', 'green'); });
             get1QCoinsBtn.addEventListener('click', () => { gameState.coins += 1000000000000000; updateUI(); saveGame(); showStatusMessage('1경 코인을 획득했습니다!', 'green'); });
@@ -669,7 +875,7 @@
         function startMoneyMakingInterval() { setInterval(() => { let currentEPS = 0; gameState.moneyMaking.slots.forEach(item => { if (item) currentEPS += calculateEPS(item); }); if (currentEPS > 0) { gameState.moneyMaking.uncollected += currentEPS; uncollectedCoinsEl.textContent = Math.floor(gameState.moneyMaking.uncollected).toLocaleString(); } }, 1000); }
         setInterval(saveGame, 5000);
         
-        // --- Kunai Minigame Logic (Performance Optimized) ---
+        // --- Kunai Minigame Logic ---
         const kunaiMinigameModal = document.getElementById('kunai-minigame-modal-container');
         const kunaiStartButton = document.getElementById('kunai-minigame-start-button');
         const closeKunaiModal = document.getElementById('close-kunai-modal');
@@ -684,17 +890,7 @@
         const kunaiClearReward = document.getElementById('kunai-clear-reward');
         let kunaiGameState = { level: 1, kunai: 5, targets: [], activeKunais: [], isGameRunning: false, canThrow: false, gameLoopId: null, maxLevel: 50 };
         
-        const kunaiLevelConfig = Array.from({ length: kunaiGameState.maxLevel }, (_, i) => { 
-            const level = i + 1; 
-            const isFinalLevel = level === kunaiGameState.maxLevel; 
-            return { 
-                targetCount: 3, 
-                speed: 1.5 + level * 0.2 + (isFinalLevel ? 1.5 : 0), 
-                pattern: level < 10 ? 'linear' : (level < 20 ? 'sine' : (level < 35 ? 'bounce' : 'teleport')), 
-                teleportInterval: level > 35 ? Math.max(500, 2500 - level * 40) : 0, 
-                shrink: isFinalLevel 
-            }; 
-        });
+        const kunaiLevelConfig = Array.from({ length: kunaiGameState.maxLevel }, (_, i) => { const level = i + 1; const isFinalLevel = level === kunaiGameState.maxLevel; return { targetCount: 3, speed: 1.5 + level * 0.2 + (isFinalLevel ? 1.5 : 0), pattern: level < 10 ? 'linear' : (level < 20 ? 'sine' : (level < 35 ? 'bounce' : 'teleport')), teleportInterval: level > 35 ? Math.max(500, 2500 - level * 40) : 0, shrink: isFinalLevel }; });
 
         function initKunaiMinigame() { kunaiStartButton.addEventListener('click', () => { kunaiGameState.level = gameState.kunaiMinigame.level; if (kunaiGameState.level > kunaiGameState.maxLevel) { const isKiwiFound = gameState.kiwiHunt.found.includes('kunai-game'); showKunaiMessage('미니게임 클리어!', '모든 레벨을 정복했습니다.', true, !isKiwiFound); } else { setupKunaiLevel(kunaiGameState.level); } showModal(kunaiMinigameModal); }); closeKunaiModal.addEventListener('click', () => { stopKunaiGame(); hideModal(kunaiMinigameModal); }); kunaiStartLevelButton.addEventListener('click', startKunaiLevel); kunaiGameArea.addEventListener('click', throwKunai); }
         
@@ -712,20 +908,7 @@
                 targetEl.classList.add('target');
                 kunaiGameArea.appendChild(targetEl);
                 const direction = Math.random() > 0.5 ? 1 : -1;
-                kunaiGameState.targets.push({
-                    el: targetEl,
-                    x: direction > 0 ? -40 : kunaiGameArea.clientWidth,
-                    y: 40 + Math.random() * (kunaiGameArea.clientHeight - 80), 
-                    vx: config.speed * direction,
-                    vy: (Math.random() - 0.5) * (config.pattern === 'bounce' ? 2 : 1),
-                    pattern: config.pattern,
-                    sinePhase: Math.random() * Math.PI * 2,
-                    teleportTimer: config.teleportInterval,
-                    lastTeleport: Date.now(),
-                    shrink: config.shrink,
-                    size: 1.0,
-                    hit: false
-                });
+                kunaiGameState.targets.push({ el: targetEl, x: direction > 0 ? -40 : kunaiGameArea.clientWidth, y: 40 + Math.random() * (kunaiGameArea.clientHeight - 80), vx: config.speed * direction, vy: (Math.random() - 0.5) * (config.pattern === 'bounce' ? 2 : 1), pattern: config.pattern, sinePhase: Math.random() * Math.PI * 2, teleportTimer: config.teleportInterval, lastTeleport: Date.now(), shrink: config.shrink, size: 1.0, hit: false });
             }
             updateKunaiUI();
             showKunaiMessage(`레벨 ${level}`, `과녁 ${config.targetCount}개를 맞추세요!`, false, false);
@@ -743,36 +926,25 @@
             kunaiGameState.targets.forEach(target => { 
                 if (target.hit) return; 
                 target.x += target.vx; 
-                if (target.pattern === 'sine') { 
-                    target.y = (areaHeight / 4) + Math.sin(target.sinePhase + target.x * 0.05) * (areaHeight / 5); 
-                } else if (target.pattern === 'bounce') { 
-                    target.y += target.vy; if (target.y <= 0 || target.y >= areaHeight - 40) target.vy *= -1; 
-                } else if (target.pattern === 'teleport' && now - target.lastTeleport > target.teleportTimer) { 
-                    target.y = 40 + Math.random() * (areaHeight / 2 - 80); target.lastTeleport = now; 
-                } 
-
-                if ((target.vx > 0 && target.x > areaWidth) || (target.vx < 0 && target.x < -40)) { 
-                    target.vx *= -1; 
-                } 
-                
-                if (target.shrink) { 
-                    target.size -= 0.0005; 
-                    if (target.size < 0.4) { gameOver(); return; } 
-                    target.el.style.transform = `translate(${target.x}px, ${target.y}px) scale(${target.size})`; 
-                } else { 
-                    target.el.style.transform = `translate(${target.x}px, ${target.y}px)`; 
-                } 
+                if (target.pattern === 'sine') { target.y = (areaHeight / 4) + Math.sin(target.sinePhase + target.x * 0.05) * (areaHeight / 5); }
+                else if (target.pattern === 'bounce') { target.y += target.vy; if (target.y <= 0 || target.y >= areaHeight - 40) target.vy *= -1; }
+                else if (target.pattern === 'teleport' && now - target.lastTeleport > target.teleportTimer) { target.y = 40 + Math.random() * (areaHeight / 2 - 80); target.lastTeleport = now; } 
+                if ((target.vx > 0 && target.x > areaWidth) || (target.vx < 0 && target.x < -40)) { target.vx *= -1; } 
+                if (target.shrink) { target.size -= 0.0005; if (target.size < 0.4) { gameOver(); return; } target.el.style.transform = `translate(${target.x}px, ${target.y}px) scale(${target.size})`; }
+                else { target.el.style.transform = `translate(${target.x}px, ${target.y}px)`; } 
             });
             
             for (let i = kunaiGameState.activeKunais.length - 1; i >= 0; i--) {
                 const kunai = kunaiGameState.activeKunais[i];
                 kunai.y += kunai.vy;
-                kunai.el.style.transform = `translate(${kunai.x - (kunai.el.offsetWidth / 2)}px, ${kunai.y - kunai.el.offsetHeight}px) rotate(180deg)`;
+                const visualX = kunai.x - (kunai.el.offsetWidth / 2); // Center the emoji for rendering
+                kunai.el.style.transform = `translate(${visualX}px, ${kunai.y - kunai.el.offsetHeight}px) rotate(180deg)`;
                 
                 let hit = false;
                 for (const target of kunaiGameState.targets) {
                     if (!target.hit) {
-                        const targetSize = 40, kunaiSize = 30;
+                        const targetSize = 40;
+                        // BUG FIX: Collision check now uses the kunai's center point.
                         if (kunai.x > target.x && kunai.x < target.x + targetSize && kunai.y > target.y && kunai.y < target.y + targetSize) {
                             handleKunaiHit(target);
                             kunai.el.remove();
@@ -789,7 +961,6 @@
                     handleKunaiMiss();
                 }
             }
-
             kunaiGameState.gameLoopId = requestAnimationFrame(kunaiGameLoop);
         }
 
@@ -803,12 +974,14 @@
             kunaiEl.classList.add('kunai-projectile'); 
             kunaiGameArea.appendChild(kunaiEl); 
             
-            kunaiGameState.activeKunais.push({ 
-                el: kunaiEl, 
-                x: kunaiGameArea.clientWidth / 2,
-                y: kunaiGameArea.clientHeight,
-                vy: -20 
-            }); 
+            // BUG FIX: Kunai now fires from the launcher's position (bottom right).
+            const launcherIconWidth = 40; // Approximate width of the launcher icon
+            kunaiGameState.activeKunais.push({
+                el: kunaiEl,
+                x: kunaiGameArea.clientWidth / 2 - 30,
+                y: kunaiGameArea.clientHeight - 40, // Start slightly above the launcher
+                vy: -20
+            });
             
             setTimeout(() => { 
                 if (kunaiGameState.isGameRunning) kunaiGameState.canThrow = true; 
