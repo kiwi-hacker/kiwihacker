@@ -292,11 +292,17 @@ candleOptions.querySelectorAll('.candle-option').forEach(opt=>{
   };
 });
 
-cake.onclick=()=>{
-  song.currentTime=0;
-  song.play();
-  document.querySelectorAll('.flame').forEach(f=>f.classList.remove('off'));
+cake.onclick = () => {
+  const bigCandles = document.querySelectorAll('.candle.big').length;
+  const smallCandles = document.querySelectorAll('.candle.small').length;
+
+  if (bigCandles === 4 && smallCandles === 7) {
+    song.currentTime = 0;
+    song.play();
+    document.querySelectorAll('.flame').forEach(f => f.classList.remove('off'));
+  }
 };
+
 
 song.onended=()=>{
   document.querySelectorAll('.flame').forEach(f=>f.classList.add('off'));
