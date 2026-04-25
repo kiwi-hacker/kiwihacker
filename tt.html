@@ -746,7 +746,8 @@
         };
 
         document.getElementById('surrender-btn').onclick = () => {
-            if (state.mode !== 'ONLINE' || !conn || state.gameOver) return;
+            if (state.mode !== 'ONLINE' || !conn || !conn.open || state.gameOver) return;
+            
             conn.send({ type: 'SURRENDER_REQUEST' });
         };
 
