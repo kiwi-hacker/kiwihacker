@@ -722,6 +722,10 @@
         document.getElementById('connect-btn').onclick = () => {
             const peerId = document.getElementById('peer-id-input').value.trim();
             if (!peerId || !peer) return;
+            if (peerId === peer.id) {
+                alert("자기 자신에게는 연결할 수 없습니다.");
+                return;
+            }
             conn = peer.connect(peerId);
             state.mySymbol = 'O';
             setupConn();
