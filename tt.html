@@ -401,9 +401,18 @@
         }
 
         async function signInWithGoogle() {
+          try {
             const result = await signInWithPopup(auth, provider);
             await ensureUserDoc(result.user);
             enterGame();
+          } catch (e) {
+            if (
+              e.code === 'auth/cancelled-popup-request' ||
+              e.code === 'auth/popup-closed-by-user'
+            ) return;
+        
+            throw e;
+          }
         }
 
         window.playAnonymously = async function () {
@@ -424,6 +433,10 @@
                 authStatus.textContent = 'Google 로그인 중...';
                 await signInWithGoogle();
             } catch (e) {
+                if (
+                  e.code === 'auth/cancelled-popup-request' ||
+                  e.code === 'auth/popup-closed-by-user'
+                ) return;
                 console.error(e);
                 alert(e.message);
                 authStatus.textContent = 'Google 로그인 실패';
@@ -435,6 +448,10 @@
                 authStatus.textContent = '회원가입/로그인 중...';
                 await signInWithGoogle();
             } catch (e) {
+                if (
+                  e.code === 'auth/cancelled-popup-request' ||
+                  e.code === 'auth/popup-closed-by-user'
+                ) return;
                 console.error(e);
                 alert(e.message);
                 authStatus.textContent = '회원가입 실패';
